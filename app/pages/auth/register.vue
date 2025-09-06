@@ -20,89 +20,69 @@
       
       <form class="mt-8 space-y-6" @submit.prevent="handleRegister">
         <div class="space-y-4">
-          <div>
-            <label for="name" class="block text-sm font-medium text-gray-700">
-              Full Name
-            </label>
-            <input
-              id="name"
-              v-model="form.name"
-              name="name"
-              type="text"
-              autocomplete="name"
-              required
-              class="input-field mt-1"
-              placeholder="Enter your full name"
-            />
-          </div>
+          <UiInput
+            v-model="form.name"
+            label="Full Name"
+            type="text"
+            placeholder="Enter your full name"
+            autocomplete="name"
+            required
+          />
           
-          <div>
-            <label for="email" class="block text-sm font-medium text-gray-700">
-              Email address
-            </label>
-            <input
-              id="email"
-              v-model="form.email"
-              name="email"
-              type="email"
-              autocomplete="email"
-              required
-              class="input-field mt-1"
-              placeholder="Enter your email"
-            />
-          </div>
+          <UiInput
+            v-model="form.email"
+            label="Email address"
+            type="email"
+            placeholder="Enter your email"
+            autocomplete="email"
+            required
+          />
           
-          <div>
-            <label for="password" class="block text-sm font-medium text-gray-700">
-              Password
-            </label>
-            <input
-              id="password"
-              v-model="form.password"
-              name="password"
-              type="password"
-              autocomplete="new-password"
-              required
-              class="input-field mt-1"
-              placeholder="Create a password"
-            />
-          </div>
+          <UiInput
+            v-model="form.password"
+            label="Password"
+            type="password"
+            placeholder="Create a password"
+            autocomplete="new-password"
+            hint="Must be at least 6 characters long"
+            required
+          />
           
-          <div>
-            <label for="confirmPassword" class="block text-sm font-medium text-gray-700">
-              Confirm Password
-            </label>
-            <input
-              id="confirmPassword"
-              v-model="form.confirmPassword"
-              name="confirmPassword"
-              type="password"
-              autocomplete="new-password"
-              required
-              class="input-field mt-1"
-              placeholder="Confirm your password"
-            />
-          </div>
+          <UiInput
+            v-model="form.confirmPassword"
+            label="Confirm Password"
+            type="password"
+            placeholder="Confirm your password"
+            autocomplete="new-password"
+            required
+          />
         </div>
 
-        <div v-if="error" class="bg-red-50 border border-red-200 text-red-600 px-4 py-3 rounded-lg">
-          {{ error }}
-        </div>
+        <UiAlert
+          v-if="error"
+          variant="error"
+          :message="error"
+          dismissible
+          @dismiss="error = ''"
+        />
 
-        <div v-if="success" class="bg-green-50 border border-green-200 text-green-600 px-4 py-3 rounded-lg">
-          {{ success }}
-        </div>
+        <UiAlert
+          v-if="success"
+          variant="success"
+          :message="success"
+          dismissible
+          @dismiss="success = ''"
+        />
 
-        <div>
-          <button
-            type="submit"
-            :disabled="authStore.loading"
-            class="w-full btn-primary py-3 text-base"
-          >
-            <span v-if="authStore.loading">Creating account...</span>
-            <span v-else>Create account</span>
-          </button>
-        </div>
+        <UiButton
+          type="submit"
+          :loading="authStore.loading"
+          loading-text="Creating account..."
+          block
+          size="lg"
+        >
+          Create account
+        </UiButton>
       </form>
     </div>
   </div>

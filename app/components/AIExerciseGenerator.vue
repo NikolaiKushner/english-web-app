@@ -1,95 +1,79 @@
 <template>
-  <div class="card">
-    <div class="flex items-center justify-between mb-6">
-      <h2 class="text-2xl font-semibold text-gray-900">
-        AI Exercise Generator
-      </h2>
-      <div class="flex items-center space-x-2">
-        <div class="w-8 h-8 bg-purple-100 rounded-full flex items-center justify-center">
-          <svg class="w-4 h-4 text-purple-600" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-            <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M13 10V3L4 14h7v7l9-11h-7z"></path>
-          </svg>
+  <UiCard variant="elevated" padding="lg">
+    <template #header>
+      <div class="flex items-center justify-between">
+        <h2 class="text-2xl font-semibold text-gray-900">
+          AI Exercise Generator
+        </h2>
+        <div class="flex items-center space-x-2">
+          <div class="w-8 h-8 bg-purple-100 rounded-full flex items-center justify-center">
+            <svg class="w-4 h-4 text-purple-600" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+              <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M13 10V3L4 14h7v7l9-11h-7z"></path>
+            </svg>
+          </div>
+          <UiBadge variant="primary" size="sm">AI-Powered</UiBadge>
         </div>
-        <span class="text-sm text-purple-600 font-medium">AI-Powered</span>
       </div>
-    </div>
+    </template>
 
     <form @submit.prevent="generateExercises" class="space-y-4">
       <div class="grid grid-cols-1 md:grid-cols-2 gap-4">
         <!-- Topic Input -->
-        <div>
-          <label for="topic" class="block text-sm font-medium text-gray-700 mb-1">
-            Topic or Theme
-          </label>
-          <input
-            id="topic"
-            v-model="form.topic"
-            type="text"
-            required
-            class="input-field"
-            placeholder="e.g., Past Tense Verbs, Family Vocabulary, Travel Phrases"
-          />
-        </div>
+        <UiInput
+          v-model="form.topic"
+          label="Topic or Theme"
+          placeholder="e.g., Past Tense Verbs, Family Vocabulary, Travel Phrases"
+          required
+        />
 
         <!-- Level Selection -->
-        <div>
-          <label for="level" class="block text-sm font-medium text-gray-700 mb-1">
-            Difficulty Level
-          </label>
-          <select
-            id="level"
-            v-model="form.level"
-            required
-            class="input-field"
-          >
-            <option value="">Select Level</option>
-            <option value="beginner">Beginner</option>
-            <option value="intermediate">Intermediate</option>
-            <option value="advanced">Advanced</option>
-          </select>
-        </div>
+        <UiSelect
+          v-model="form.level"
+          label="Difficulty Level"
+          placeholder="Select Level"
+          :options="[
+            { label: 'Beginner', value: 'beginner' },
+            { label: 'Intermediate', value: 'intermediate' },
+            { label: 'Advanced', value: 'advanced' }
+          ]"
+          required
+        />
 
         <!-- Exercise Type -->
-        <div>
-          <label for="type" class="block text-sm font-medium text-gray-700 mb-1">
-            Exercise Type
-          </label>
-          <select
-            id="type"
-            v-model="form.type"
-            required
-            class="input-field"
-          >
-            <option value="">Select Type</option>
-            <option value="multiple_choice">Multiple Choice</option>
-            <option value="fill_blank">Fill in the Blank</option>
-            <option value="translation">Translation</option>
-            <option value="listening">Listening (Conceptual)</option>
-          </select>
-        </div>
+        <UiSelect
+          v-model="form.type"
+          label="Exercise Type"
+          placeholder="Select Type"
+          :options="[
+            { label: 'Multiple Choice', value: 'multiple_choice' },
+            { label: 'Fill in the Blank', value: 'fill_blank' },
+            { label: 'Translation', value: 'translation' },
+            { label: 'Listening (Conceptual)', value: 'listening' }
+          ]"
+          required
+        />
 
         <!-- Count -->
-        <div>
-          <label for="count" class="block text-sm font-medium text-gray-700 mb-1">
-            Number of Exercises
-          </label>
-          <select
-            id="count"
-            v-model="form.count"
-            class="input-field"
-          >
-            <option value="1">1 Exercise</option>
-            <option value="2">2 Exercises</option>
-            <option value="3">3 Exercises</option>
-            <option value="5">5 Exercises</option>
-          </select>
-        </div>
+        <UiSelect
+          v-model="form.count"
+          label="Number of Exercises"
+          :options="[
+            { label: '1 Exercise', value: 1 },
+            { label: '2 Exercises', value: 2 },
+            { label: '3 Exercises', value: 3 },
+            { label: '5 Exercises', value: 5 }
+          ]"
+        />
       </div>
 
       <!-- Error Display -->
-      <div v-if="error" class="bg-red-50 border border-red-200 text-red-600 px-4 py-3 rounded-lg">
-        {{ error }}
-      </div>
+      <UiAlert
+        v-if="error"
+        variant="error"
+        :message="error"
+        dismissible
+        @dismiss="error = ''"
+      />
 
       <!-- Generate Button -->
       <div class="flex justify-between items-center">
@@ -102,85 +86,95 @@
           </span>
         </div>
         
-        <button
+        <UiButton
           type="submit"
-          :disabled="aiService.loading.value"
-          class="btn-primary px-6 py-2"
+          :loading="aiService.loading.value"
+          loading-text="Generating..."
+          variant="primary"
+          size="md"
         >
-          <span v-if="aiService.loading.value" class="flex items-center space-x-2">
-            <div class="animate-spin rounded-full h-4 w-4 border-b-2 border-white"></div>
-            <span>Generating...</span>
-          </span>
-          <span v-else class="flex items-center space-x-2">
+          <template #icon-left>
             <svg class="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24">
               <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M13 10V3L4 14h7v7l9-11h-7z"></path>
             </svg>
-            <span>Generate with AI</span>
-          </span>
-        </button>
+          </template>
+          Generate with AI
+        </UiButton>
       </div>
     </form>
 
-    <!-- Generated Exercises Preview -->
-    <div v-if="generatedExercises.length > 0" class="mt-8 pt-6 border-t border-gray-200">
-      <div class="flex items-center justify-between mb-4">
-        <h3 class="text-lg font-medium text-gray-900">Generated Exercises Preview</h3>
-        <button
-          @click="addToLesson"
-          :disabled="addingToLesson"
-          class="btn-primary text-sm"
-        >
-          <span v-if="addingToLesson">Adding...</span>
-          <span v-else>Add to Lesson</span>
-        </button>
-      </div>
+  </UiCard>
 
-      <div class="space-y-4">
-        <div
-          v-for="(exercise, index) in generatedExercises"
-          :key="index"
-          class="bg-gray-50 rounded-lg p-4 border border-gray-200"
+  <!-- Generated Exercises Preview -->
+  <UiCard 
+    v-if="generatedExercises.length > 0" 
+    variant="default" 
+    padding="lg"
+    class="mt-6"
+  >
+    <template #header>
+      <div class="flex items-center justify-between">
+        <h3 class="text-lg font-medium text-gray-900">Generated Exercises Preview</h3>
+        <UiButton
+          @click="addToLesson"
+          :loading="addingToLesson"
+          loading-text="Adding..."
+          variant="primary"
+          size="sm"
         >
-          <div class="flex items-start justify-between mb-2">
-            <h4 class="font-medium text-gray-900">Exercise {{ index + 1 }}</h4>
-            <span class="text-xs bg-purple-100 text-purple-800 px-2 py-1 rounded-full">
-              {{ exercise.type.replace('_', ' ') }}
-            </span>
-          </div>
-          
-          <p class="text-gray-700 mb-3">{{ exercise.question }}</p>
-          
-          <!-- Show options for multiple choice -->
-          <div v-if="exercise.options" class="mb-3">
-            <div class="text-sm text-gray-600 mb-1">Options:</div>
-            <ul class="list-disc list-inside text-sm text-gray-600 space-y-1">
-              <li 
-                v-for="option in exercise.options" 
-                :key="option"
-                :class="{ 'font-medium text-green-700': option === exercise.correct_answer }"
-              >
-                {{ option }}
-                <span v-if="option === exercise.correct_answer" class="text-green-600 ml-1">✓</span>
-              </li>
-            </ul>
-          </div>
-          
-          <!-- Show correct answer for non-multiple choice -->
-          <div v-else class="mb-3">
-            <div class="text-sm text-gray-600">
-              <strong>Answer:</strong> 
-              <span class="text-green-700 font-medium">{{ exercise.correct_answer }}</span>
-            </div>
-          </div>
-          
-          <!-- Show explanation -->
-          <div class="text-sm text-blue-700 bg-blue-50 p-3 rounded border border-blue-200">
-            <strong>AI Explanation:</strong> {{ exercise.explanation }}
+          Add to Lesson
+        </UiButton>
+      </div>
+    </template>
+
+    <div class="space-y-4">
+      <UiCard
+        v-for="(exercise, index) in generatedExercises"
+        :key="index"
+        variant="flat"
+        padding="md"
+      >
+        <div class="flex items-start justify-between mb-2">
+          <h4 class="font-medium text-gray-900">Exercise {{ index + 1 }}</h4>
+          <UiBadge variant="primary" size="xs">
+            {{ exercise.type.replace('_', ' ') }}
+          </UiBadge>
+        </div>
+        
+        <p class="text-gray-700 mb-3">{{ exercise.question }}</p>
+        
+        <!-- Show options for multiple choice -->
+        <div v-if="exercise.options" class="mb-3">
+          <div class="text-sm text-gray-600 mb-1">Options:</div>
+          <ul class="list-disc list-inside text-sm text-gray-600 space-y-1">
+            <li 
+              v-for="option in exercise.options" 
+              :key="option"
+              :class="{ 'font-medium text-green-700': option === exercise.correct_answer }"
+            >
+              {{ option }}
+              <UiBadge v-if="option === exercise.correct_answer" variant="success" size="xs" class="ml-2">
+                Correct
+              </UiBadge>
+            </li>
+          </ul>
+        </div>
+        
+        <!-- Show correct answer for non-multiple choice -->
+        <div v-else class="mb-3">
+          <div class="text-sm text-gray-600">
+            <strong>Answer:</strong> 
+            <UiBadge variant="success" size="xs" class="ml-1">{{ exercise.correct_answer }}</UiBadge>
           </div>
         </div>
-      </div>
+        
+        <!-- Show explanation -->
+        <UiAlert variant="info" class="mt-3">
+          <strong>AI Explanation:</strong> {{ exercise.explanation }}
+        </UiAlert>
+      </UiCard>
     </div>
-  </div>
+  </UiCard>
 </template>
 
 <script setup lang="ts">

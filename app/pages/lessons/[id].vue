@@ -1,7 +1,7 @@
 <template>
   <div class="max-w-4xl mx-auto px-4 sm:px-6 lg:px-8 py-8">
     <!-- Loading State -->
-    <LoadingSpinner 
+    <UiLoadingSpinner 
       v-if="learningStore.loading" 
       size="lg" 
       message="Loading lesson..." 
@@ -10,17 +10,16 @@
     <!-- Lesson Content -->
     <div v-else-if="lesson" class="space-y-8">
       <!-- Lesson Header -->
-      <div class="card">
+      <UiCard variant="elevated" padding="lg">
         <div class="flex items-start justify-between mb-4">
           <div class="flex items-center space-x-3">
-            <span
-              :class="[
-                'px-3 py-1 text-sm font-medium rounded-full',
-                levelColors[lesson.level]
-              ]"
+            <UiBadge
+              :variant="getBadgeVariant(lesson.level)"
+              size="sm"
+              rounded
             >
               {{ lesson.level }}
-            </span>
+            </UiBadge>
             <span class="text-sm text-gray-500">Lesson {{ lesson.order }}</span>
           </div>
           <div v-if="learningStore.isLessonCompleted(lesson.id)" class="text-green-600">
@@ -34,7 +33,7 @@
         <p class="text-lg text-gray-600 mb-6">{{ lesson.description }}</p>
 
         <div class="flex items-center space-x-4">
-          <span class="text-sm text-gray-500">{{ lesson.category }}</span>
+          <UiBadge variant="info" size="sm">{{ lesson.category }}</UiBadge>
           <div class="flex items-center space-x-2">
             <svg class="w-4 h-4 text-gray-400" fill="none" stroke="currentColor" viewBox="0 0 24 24">
               <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 8v4l3 3m6-3a9 9 0 11-18 0 9 9 0 0118 0z"></path>
@@ -42,55 +41,63 @@
             <span class="text-sm text-gray-500">Estimated time: 15-20 minutes</span>
           </div>
         </div>
-      </div>
+      </UiCard>
 
       <!-- Lesson Content -->
-      <div class="card">
-        <h2 class="text-2xl font-semibold text-gray-900 mb-4">Lesson Content</h2>
+      <UiCard title="Lesson Content" variant="default" padding="lg">
         <div class="prose max-w-none" v-html="formattedContent"></div>
-      </div>
+      </UiCard>
 
       <!-- Exercises Section -->
-      <div v-if="exercises.length > 0" class="card">
-        <h2 class="text-2xl font-semibold text-gray-900 mb-6">Practice Exercises</h2>
+      <UiCard 
+        v-if="exercises.length > 0" 
+        title="Practice Exercises" 
+        variant="default" 
+        padding="lg"
+      >
         <ExercisePlayer
           :exercises="exercises"
           :lesson-id="lesson.id"
           @complete="handleExerciseComplete"
         />
-      </div>
+      </UiCard>
 
       <!-- Navigation -->
       <div class="flex justify-between">
-        <NuxtLink
+        <UiButton
           to="/lessons"
-          class="btn-secondary"
+          variant="secondary"
         >
-          ← Back to Lessons
-        </NuxtLink>
-        <button
+          <template #icon-left>
+            <svg class="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+              <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M15 19l-7-7 7-7"></path>
+            </svg>
+          </template>
+          Back to Lessons
+        </UiButton>
+        <UiButton
           v-if="!learningStore.isLessonCompleted(lesson.id)"
           @click="completeLesson()"
-          :disabled="learningStore.loading"
-          class="btn-primary"
+          :loading="learningStore.loading"
+          loading-text="Completing..."
+          variant="primary"
         >
           Mark as Complete
-        </button>
+        </UiButton>
       </div>
     </div>
 
     <!-- Error State -->
     <div v-else class="text-center py-12">
-      <div class="w-24 h-24 bg-red-100 rounded-full flex items-center justify-center mx-auto mb-4">
-        <svg class="w-12 h-12 text-red-400" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-          <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 8v4m0 4h.01M21 12a9 9 0 11-18 0 9 9 0 0118 0z"></path>
-        </svg>
-      </div>
-      <h3 class="text-lg font-medium text-gray-900 mb-2">Lesson not found</h3>
-      <p class="text-gray-600 mb-4">The lesson you're looking for doesn't exist or has been removed.</p>
-      <NuxtLink to="/lessons" class="btn-primary">
+      <UiAlert
+        variant="error"
+        title="Lesson not found"
+        message="The lesson you're looking for doesn't exist or has been removed."
+        class="max-w-md mx-auto mb-6"
+      />
+      <UiButton to="/lessons" variant="primary">
         Browse All Lessons
-      </NuxtLink>
+      </UiButton>
     </div>
   </div>
 </template>
@@ -108,6 +115,19 @@ const levelColors = {
   beginner: 'bg-green-100 text-green-800',
   intermediate: 'bg-yellow-100 text-yellow-800',
   advanced: 'bg-red-100 text-red-800'
+}
+
+const getBadgeVariant = (level: string) => {
+  switch (level) {
+    case 'beginner':
+      return 'success'
+    case 'intermediate':
+      return 'warning'
+    case 'advanced':
+      return 'danger'
+    default:
+      return 'default'
+  }
 }
 
 const formattedContent = computed(() => {

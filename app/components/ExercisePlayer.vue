@@ -178,13 +178,15 @@
 
       <!-- Individual Exercise Action -->
       <div v-if="!exerciseResults[exercise.id] && userAnswers[exercise.id]" class="mt-4">
-        <button
+        <UiButton
           @click="checkSingleExercise(exercise)"
-          :disabled="loading"
-          class="btn-primary text-sm"
+          :loading="loading"
+          loading-text="Checking..."
+          variant="primary"
+          size="sm"
         >
           Check Answer
-        </button>
+        </UiButton>
       </div>
     </div>
 
@@ -200,27 +202,29 @@
       </div>
       
       <div class="flex space-x-3">
-        <button
+        <UiButton
           @click="checkAllExercises"
           :disabled="loading || !hasAnswers"
-          class="btn-secondary"
+          :loading="loading"
+          loading-text="Checking..."
+          variant="secondary"
         >
-          {{ loading ? 'Checking...' : 'Check All Answers' }}
-        </button>
-        <button
+          Check All Answers
+        </UiButton>
+        <UiButton
           @click="resetExercises"
           v-if="hasResults"
-          class="btn-secondary"
+          variant="secondary"
         >
           Try Again
-        </button>
-        <button
+        </UiButton>
+        <UiButton
           @click="completeExercises"
           :disabled="loading || !allCompleted"
-          class="btn-primary"
+          variant="primary"
         >
           {{ allCompleted ? 'Complete Lesson' : 'Complete All First' }}
-        </button>
+        </UiButton>
       </div>
     </div>
   </div>

@@ -10,24 +10,20 @@
     <!-- Level Filter -->
     <div class="mb-8">
       <div class="flex flex-wrap gap-2">
-        <button
+        <UiButton
           v-for="level in levels"
           :key="level.value"
           @click="selectedLevel = level.value"
-          :class="[
-            'px-4 py-2 rounded-lg font-medium transition-colors duration-200',
-            selectedLevel === level.value
-              ? 'bg-blue-600 text-white'
-              : 'bg-gray-200 text-gray-700 hover:bg-gray-300'
-          ]"
+          :variant="selectedLevel === level.value ? 'primary' : 'secondary'"
+          size="sm"
         >
           {{ level.label }}
-        </button>
+        </UiButton>
       </div>
     </div>
 
     <!-- Loading State -->
-    <LoadingSpinner 
+    <UiLoadingSpinner 
       v-if="learningStore.loading" 
       size="lg" 
       message="Loading lessons..." 
@@ -35,21 +31,22 @@
 
     <!-- Lessons Grid -->
     <div v-else-if="filteredLessons.length > 0" class="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6">
-      <div
+      <UiCard
         v-for="lesson in filteredLessons"
         :key="lesson.id"
-        class="card hover:shadow-lg transition-shadow duration-200"
+        hover
+        padding="md"
+        class="transition-shadow duration-200"
       >
         <div class="flex items-start justify-between mb-4">
           <div class="flex items-center space-x-2">
-            <span
-              :class="[
-                'px-2 py-1 text-xs font-medium rounded-full',
-                levelColors[lesson.level]
-              ]"
+            <UiBadge
+              :variant="getBadgeVariant(lesson.level)"
+              size="xs"
+              rounded
             >
               {{ lesson.level }}
-            </span>
+            </UiBadge>
             <span class="text-sm text-gray-500">Lesson {{ lesson.order }}</span>
           </div>
           <div v-if="learningStore.isLessonCompleted(lesson.id)" class="text-green-600">
@@ -64,14 +61,15 @@
 
         <div class="flex items-center justify-between">
           <span class="text-sm text-gray-500">{{ lesson.category }}</span>
-          <NuxtLink
+          <UiButton
             :to="`/lessons/${lesson.id}`"
-            class="btn-primary text-sm"
+            variant="primary"
+            size="sm"
           >
             Start Lesson
-          </NuxtLink>
+          </UiButton>
         </div>
-      </div>
+      </UiCard>
     </div>
 
     <!-- Empty State -->
@@ -104,6 +102,19 @@ const levelColors = {
   beginner: 'bg-green-100 text-green-800',
   intermediate: 'bg-yellow-100 text-yellow-800',
   advanced: 'bg-red-100 text-red-800'
+}
+
+const getBadgeVariant = (level: string) => {
+  switch (level) {
+    case 'beginner':
+      return 'success'
+    case 'intermediate':
+      return 'warning'
+    case 'advanced':
+      return 'danger'
+    default:
+      return 'default'
+  }
 }
 
 const filteredLessons = computed(() => {

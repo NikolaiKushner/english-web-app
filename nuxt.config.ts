@@ -7,6 +7,17 @@ export default defineNuxtConfig({
     '@pinia/nuxt',
     '@vueuse/nuxt'
   ],
+  components: [
+    {
+      path: '~/components',
+      pathPrefix: false,
+    },
+    {
+      path: '~/components/ui',
+      prefix: 'Ui',
+      pathPrefix: false,
+    }
+  ],
   runtimeConfig: {
     // Private keys (only available on server-side)
     openaiApiKey: process.env.OPENAI_API_KEY,

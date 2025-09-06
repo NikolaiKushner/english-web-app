@@ -20,53 +20,45 @@
       
       <form class="mt-8 space-y-6" @submit.prevent="handleLogin">
         <div class="space-y-4">
-          <div>
-            <label for="email" class="block text-sm font-medium text-gray-700">
-              Email address
-            </label>
-            <input
-              id="email"
-              v-model="form.email"
-              name="email"
-              type="email"
-              autocomplete="email"
-              required
-              class="input-field mt-1"
-              placeholder="Enter your email"
-            />
-          </div>
+          <UiInput
+            v-model="form.email"
+            label="Email address"
+            type="email"
+            placeholder="Enter your email"
+            autocomplete="email"
+            required
+            :error="error && error.includes('email') ? error : undefined"
+          />
           
-          <div>
-            <label for="password" class="block text-sm font-medium text-gray-700">
-              Password
-            </label>
-            <input
-              id="password"
-              v-model="form.password"
-              name="password"
-              type="password"
-              autocomplete="current-password"
-              required
-              class="input-field mt-1"
-              placeholder="Enter your password"
-            />
-          </div>
+          <UiInput
+            v-model="form.password"
+            label="Password"
+            type="password"
+            placeholder="Enter your password"
+            autocomplete="current-password"
+            required
+            :error="error && error.includes('password') ? error : undefined"
+          />
         </div>
 
-        <div v-if="error" class="bg-red-50 border border-red-200 text-red-600 px-4 py-3 rounded-lg">
-          {{ error }}
-        </div>
+        <UiAlert
+          v-if="error"
+          variant="error"
+          :message="error"
+          dismissible
+          @dismiss="error = ''"
+        />
 
-        <div>
-          <button
-            type="submit"
-            :disabled="authStore.loading"
-            class="w-full btn-primary py-3 text-base"
-          >
-            <span v-if="authStore.loading">Signing in...</span>
-            <span v-else>Sign in</span>
-          </button>
-        </div>
+        <UiButton
+          type="submit"
+          :loading="authStore.loading"
+          loading-text="Signing in..."
+          block
+          size="lg"
+          class="mt-6"
+        >
+          Sign in
+        </UiButton>
       </form>
     </div>
   </div>

@@ -13,19 +13,23 @@
             Start your journey to fluency today.
           </p>
           <div class="flex flex-col sm:flex-row gap-4 justify-center">
-            <NuxtLink 
+            <UiButton 
               v-if="!authStore?.user" 
               to="/auth/register" 
-              class="bg-yellow-400 hover:bg-yellow-500 text-gray-900 font-bold py-3 px-8 rounded-lg text-lg transition-colors duration-200"
+              variant="warning"
+              size="xl"
+              class="bg-yellow-400 hover:bg-yellow-500 text-gray-900"
             >
               Get Started Free
-            </NuxtLink>
-            <NuxtLink 
+            </UiButton>
+            <UiButton 
               to="/lessons" 
-              class="border-2 border-white hover:bg-white hover:text-blue-600 text-white font-bold py-3 px-8 rounded-lg text-lg transition-colors duration-200"
+              variant="ghost"
+              size="xl"
+              class="border-2 border-white hover:bg-white hover:text-blue-600 text-white"
             >
               Browse Lessons
-            </NuxtLink>
+            </UiButton>
           </div>
         </div>
       </div>
@@ -99,12 +103,19 @@
         </div>
 
         <div class="text-center mt-12">
-          <NuxtLink to="/lessons/create" class="bg-purple-600 hover:bg-purple-700 text-white font-bold py-4 px-8 rounded-lg text-lg transition-colors duration-200 inline-flex items-center space-x-2">
-            <svg class="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-              <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M13 10V3L4 14h7v7l9-11h-7z"></path>
-            </svg>
-            <span>Try AI Exercise Creator</span>
-          </NuxtLink>
+          <UiButton 
+            to="/lessons/create" 
+            variant="primary"
+            size="xl"
+            class="bg-purple-600 hover:bg-purple-700"
+          >
+            <template #icon-left>
+              <svg class="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M13 10V3L4 14h7v7l9-11h-7z"></path>
+              </svg>
+            </template>
+            Try AI Exercise Creator
+          </UiButton>
         </div>
       </div>
     </section>
@@ -170,20 +181,22 @@
         <p class="text-xl text-gray-300 mb-8 max-w-2xl mx-auto">
           Join thousands of students who are already improving their English skills with our platform.
         </p>
-        <NuxtLink 
+        <UiButton 
           v-if="!authStore?.user"
           to="/auth/register" 
-          class="bg-blue-600 hover:bg-blue-700 text-white font-bold py-3 px-8 rounded-lg text-lg transition-colors duration-200"
+          variant="primary"
+          size="xl"
         >
           Start Learning Now
-        </NuxtLink>
-        <NuxtLink 
+        </UiButton>
+        <UiButton 
           v-else
           to="/lessons" 
-          class="bg-blue-600 hover:bg-blue-700 text-white font-bold py-3 px-8 rounded-lg text-lg transition-colors duration-200"
+          variant="primary"
+          size="xl"
         >
           Continue Learning
-        </NuxtLink>
+        </UiButton>
       </div>
     </section>
   </div>

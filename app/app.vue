@@ -1,15 +1,15 @@
 <template>
-  <ErrorBoundary>
+  <UiErrorBoundary>
     <div class="min-h-screen bg-gray-50">
       <NuxtRouteAnnouncer />
-      <AppHeader />
+      <UiHeader />
       <main>
         <NuxtPage />
       </main>
-      <AppFooter />
-      <Toast />
+      <UiFooter />
+      <UiToast />
     </div>
-  </ErrorBoundary>
+  </UiErrorBoundary>
 </template>
 
 <style>

@@ -9,18 +9,16 @@
 
     <div class="space-y-12">
       <!-- Mission Section -->
-      <div class="card">
-        <h2 class="text-2xl font-semibold text-gray-900 mb-4">Our Mission</h2>
+      <UiCard title="Our Mission" variant="elevated" padding="lg">
         <p class="text-gray-600 leading-relaxed">
           Our mission is to break down language barriers by providing high-quality English education that's 
           accessible to learners worldwide. We believe that everyone deserves the opportunity to master English, 
           regardless of their background or location.
         </p>
-      </div>
+      </UiCard>
 
       <!-- Features Section -->
-      <div class="card">
-        <h2 class="text-2xl font-semibold text-gray-900 mb-6">What Makes Us Different</h2>
+      <UiCard title="What Makes Us Different" variant="default" padding="lg">
         <div class="grid grid-cols-1 md:grid-cols-2 gap-6">
           <div class="flex items-start space-x-3">
             <div class="w-8 h-8 bg-blue-100 rounded-full flex items-center justify-center flex-shrink-0">
@@ -70,25 +68,24 @@
             </div>
           </div>
         </div>
-      </div>
+      </UiCard>
 
       <!-- Team Section -->
-      <div class="card">
-        <h2 class="text-2xl font-semibold text-gray-900 mb-4">Our Team</h2>
+      <UiCard title="Our Team" variant="default" padding="lg">
         <p class="text-gray-600 leading-relaxed">
           We're a diverse team of educators, developers, and language enthusiasts committed to creating 
           the best possible learning experience. Our combined expertise in education, technology, and 
           linguistics drives us to constantly improve and innovate.
         </p>
-      </div>
+      </UiCard>
 
       <!-- CTA Section -->
       <div class="text-center py-8">
         <h2 class="text-2xl font-semibold text-gray-900 mb-4">Ready to Start Your Journey?</h2>
         <p class="text-gray-600 mb-6">Join thousands of learners who are improving their English with us.</p>
-        <NuxtLink to="/auth/register" class="btn-primary text-lg py-3 px-8">
+        <UiButton to="/auth/register" variant="primary" size="lg">
           Get Started Today
-        </NuxtLink>
+        </UiButton>
       </div>
     </div>
   </div>

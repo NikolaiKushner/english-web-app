@@ -8,7 +8,7 @@
     </div>
 
     <!-- Loading State -->
-    <LoadingSpinner 
+    <UiLoadingSpinner 
       v-if="learningStore.loading" 
       size="lg" 
       message="Loading your progress..." 
@@ -18,51 +18,76 @@
     <div v-else-if="authStore.user" class="space-y-8">
       <!-- Stats Overview -->
       <div class="grid grid-cols-1 md:grid-cols-4 gap-6">
-        <div class="card text-center">
+        <UiCard variant="default" padding="md" class="text-center">
           <div class="text-3xl font-bold text-blue-600 mb-2">
             {{ completedLessonsCount }}
           </div>
           <div class="text-sm text-gray-600">Lessons Completed</div>
-        </div>
+        </UiCard>
         
-        <div class="card text-center">
+        <UiCard variant="default" padding="md" class="text-center">
           <div class="text-3xl font-bold text-green-600 mb-2">
             {{ completedExercisesCount }}
           </div>
           <div class="text-sm text-gray-600">Exercises Completed</div>
-        </div>
+        </UiCard>
         
-        <div class="card text-center">
+        <UiCard variant="default" padding="md" class="text-center">
           <div class="text-3xl font-bold text-purple-600 mb-2">
             {{ currentStreak }}
           </div>
           <div class="text-sm text-gray-600">Day Streak</div>
-        </div>
+        </UiCard>
         
-        <div class="card text-center">
+        <UiCard variant="default" padding="md" class="text-center">
           <div class="text-3xl font-bold text-orange-600 mb-2">
             {{ overallProgress }}%
           </div>
           <div class="text-sm text-gray-600">Overall Progress</div>
-        </div>
+          <UiProgress 
+            :value="overallProgress" 
+            variant="info" 
+            size="sm" 
+            class="mt-2" 
+            :show-label="false"
+          />
+        </UiCard>
       </div>
 
-      <!-- Progress Chart Placeholder -->
-      <div class="card">
-        <h2 class="text-xl font-semibold text-gray-900 mb-4">Learning Progress</h2>
-        <div class="h-64 bg-gray-100 rounded-lg flex items-center justify-center">
-          <div class="text-center">
-            <svg class="w-16 h-16 text-gray-400 mx-auto mb-4" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-              <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M9 19v-6a2 2 0 00-2-2H5a2 2 0 00-2 2v6a2 2 0 002 2h2a2 2 0 002-2zm0 0V9a2 2 0 012-2h2a2 2 0 012 2v10m-6 0a2 2 0 002 2h2a2 2 0 002-2m0 0V5a2 2 0 012-2h2a2 2 0 012 2v14a2 2 0 01-2 2h-2a2 2 0 01-2-2z"></path>
-            </svg>
-            <p class="text-gray-500">Progress chart will be displayed here</p>
+      <!-- Progress Chart -->
+      <UiCard title="Learning Progress" variant="default" padding="lg">
+        <div class="space-y-4">
+          <div class="flex items-center justify-between text-sm text-gray-600">
+            <span>Overall Course Completion</span>
+            <span>{{ overallProgress }}%</span>
+          </div>
+          <UiProgress 
+            :value="overallProgress" 
+            variant="success" 
+            size="lg" 
+            animated
+            striped
+          />
+          
+          <div class="grid grid-cols-3 gap-4 mt-6 text-center">
+            <div>
+              <div class="text-lg font-semibold text-green-600">{{ getCompletedLessonsByLevel('beginner') }}</div>
+              <div class="text-xs text-gray-500">Beginner</div>
+            </div>
+            <div>
+              <div class="text-lg font-semibold text-yellow-600">{{ getCompletedLessonsByLevel('intermediate') }}</div>
+              <div class="text-xs text-gray-500">Intermediate</div>
+            </div>
+            <div>
+              <div class="text-lg font-semibold text-red-600">{{ getCompletedLessonsByLevel('advanced') }}</div>
+              <div class="text-xs text-gray-500">Advanced</div>
+            </div>
           </div>
         </div>
-      </div>
+      </UiCard>
 
       <!-- Recent Activity -->
-      <div class="card">
-        <h2 class="text-xl font-semibold text-gray-900 mb-4">Recent Activity</h2>
+      <UiCard title="Recent Activity" variant="default" padding="lg">
         <div v-if="recentActivityWithDetails.length > 0" class="space-y-3">
           <div
             v-for="activity in recentActivityWithDetails"
@@ -94,47 +119,54 @@
             </div>
           </div>
         </div>
-        <div v-else class="text-center py-8 text-gray-500">
-          No recent activity. Start learning to see your progress here!
-        </div>
-      </div>
+        <UiAlert v-else variant="info" message="No recent activity. Start learning to see your progress here!" />
+      </UiCard>
 
-      <!-- Achievements Placeholder -->
-      <div class="card">
-        <h2 class="text-xl font-semibold text-gray-900 mb-4">Achievements</h2>
+      <!-- Achievements -->
+      <UiCard title="Achievements" variant="default" padding="lg">
         <div class="grid grid-cols-2 md:grid-cols-4 gap-4">
-          <div
+          <UiCard
             v-for="achievement in achievements"
             :key="achievement.id"
-            :class="[
-              'p-4 rounded-lg text-center',
-              achievement.unlocked ? 'bg-yellow-50 border-2 border-yellow-200' : 'bg-gray-50 border-2 border-gray-200'
-            ]"
+            :variant="achievement.unlocked ? 'outlined' : 'flat'"
+            padding="md"
+            class="text-center"
+            :class="{
+              'border-yellow-300 bg-yellow-50': achievement.unlocked,
+              'opacity-60': !achievement.unlocked
+            }"
           >
             <div class="text-2xl mb-2">{{ achievement.icon }}</div>
             <div class="text-sm font-medium text-gray-900">{{ achievement.name }}</div>
             <div class="text-xs text-gray-500">{{ achievement.description }}</div>
-          </div>
+            <UiBadge 
+              v-if="achievement.unlocked" 
+              variant="warning" 
+              size="xs" 
+              class="mt-2"
+            >
+              Unlocked
+            </UiBadge>
+          </UiCard>
         </div>
-      </div>
+      </UiCard>
     </div>
 
     <!-- Not Logged In -->
     <div v-else class="text-center py-12">
-      <div class="w-24 h-24 bg-gray-100 rounded-full flex items-center justify-center mx-auto mb-4">
-        <svg class="w-12 h-12 text-gray-400" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-          <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M16 7a4 4 0 11-8 0 4 4 0 018 0zM12 14a7 7 0 00-7 7h14a7 7 0 00-7-7z"></path>
-        </svg>
-      </div>
-      <h3 class="text-lg font-medium text-gray-900 mb-2">Sign in to track your progress</h3>
-      <p class="text-gray-600 mb-4">Create an account or sign in to start tracking your learning journey.</p>
+      <UiAlert
+        variant="info"
+        title="Sign in to track your progress"
+        message="Create an account or sign in to start tracking your learning journey."
+        class="max-w-md mx-auto mb-6"
+      />
       <div class="flex justify-center space-x-4">
-        <NuxtLink to="/auth/login" class="btn-secondary">
+        <UiButton to="/auth/login" variant="secondary">
           Sign In
-        </NuxtLink>
-        <NuxtLink to="/auth/register" class="btn-primary">
+        </UiButton>
+        <UiButton to="/auth/register" variant="primary">
           Sign Up
-        </NuxtLink>
+        </UiButton>
       </div>
     </div>
   </div>
@@ -178,6 +210,10 @@ const recentActivityWithDetails = computed(() => {
     }
   })
 })
+
+const getCompletedLessonsByLevel = (level: string) => {
+  return learningStore.getCompletedLessonsByLevel(level).length
+}
 
 const achievements = ref([
   {

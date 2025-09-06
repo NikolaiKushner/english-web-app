@@ -9,110 +9,87 @@
 
     <div class="grid grid-cols-1 lg:grid-cols-2 gap-12">
       <!-- Contact Form -->
-      <div class="card">
-        <h2 class="text-2xl font-semibold text-gray-900 mb-6">Send us a Message</h2>
+      <UiCard title="Send us a Message" variant="elevated" padding="lg">
         <form @submit.prevent="handleSubmit" class="space-y-6">
           <div class="grid grid-cols-1 sm:grid-cols-2 gap-4">
-            <div>
-              <label for="firstName" class="block text-sm font-medium text-gray-700 mb-1">
-                First Name *
-              </label>
-              <input
-                id="firstName"
-                v-model="form.firstName"
-                type="text"
-                required
-                class="input-field"
-                placeholder="Your first name"
-              />
-            </div>
-            <div>
-              <label for="lastName" class="block text-sm font-medium text-gray-700 mb-1">
-                Last Name *
-              </label>
-              <input
-                id="lastName"
-                v-model="form.lastName"
-                type="text"
-                required
-                class="input-field"
-                placeholder="Your last name"
-              />
-            </div>
-          </div>
-
-          <div>
-            <label for="email" class="block text-sm font-medium text-gray-700 mb-1">
-              Email Address *
-            </label>
-            <input
-              id="email"
-              v-model="form.email"
-              type="email"
+            <UiInput
+              v-model="form.firstName"
+              label="First Name"
+              placeholder="Your first name"
               required
-              class="input-field"
-              placeholder="your.email@example.com"
+            />
+            <UiInput
+              v-model="form.lastName"
+              label="Last Name"
+              placeholder="Your last name"
+              required
             />
           </div>
 
-          <div>
-            <label for="subject" class="block text-sm font-medium text-gray-700 mb-1">
-              Subject *
-            </label>
-            <select
-              id="subject"
-              v-model="form.subject"
-              required
-              class="input-field"
-            >
-              <option value="">Select a subject</option>
-              <option value="general">General Inquiry</option>
-              <option value="technical">Technical Support</option>
-              <option value="billing">Billing Question</option>
-              <option value="feature">Feature Request</option>
-              <option value="bug">Bug Report</option>
-              <option value="other">Other</option>
-            </select>
-          </div>
+          <UiInput
+            v-model="form.email"
+            label="Email Address"
+            type="email"
+            placeholder="your.email@example.com"
+            required
+          />
 
-          <div>
-            <label for="message" class="block text-sm font-medium text-gray-700 mb-1">
-              Message *
-            </label>
-            <textarea
-              id="message"
-              v-model="form.message"
-              rows="6"
-              required
-              class="input-field resize-none"
-              placeholder="Tell us how we can help you..."
-            ></textarea>
-          </div>
+          <UiSelect
+            v-model="form.subject"
+            label="Subject"
+            placeholder="Select a subject"
+            :options="[
+              { label: 'General Inquiry', value: 'general' },
+              { label: 'Technical Support', value: 'technical' },
+              { label: 'Billing Question', value: 'billing' },
+              { label: 'Feature Request', value: 'feature' },
+              { label: 'Bug Report', value: 'bug' },
+              { label: 'Other', value: 'other' }
+            ]"
+            required
+          />
 
-          <div v-if="error" class="bg-red-50 border border-red-200 text-red-600 px-4 py-3 rounded-lg">
-            {{ error }}
-          </div>
+          <UiTextarea
+            v-model="form.message"
+            label="Message"
+            placeholder="Tell us how we can help you..."
+            :rows="6"
+            resize="none"
+            required
+          />
 
-          <div v-if="success" class="bg-green-50 border border-green-200 text-green-600 px-4 py-3 rounded-lg">
-            {{ success }}
-          </div>
+          <UiAlert
+            v-if="error"
+            variant="error"
+            :message="error"
+            dismissible
+            @dismiss="error = ''"
+          />
 
-          <button
+          <UiAlert
+            v-if="success"
+            variant="success"
+            :message="success"
+            dismissible
+            @dismiss="success = ''"
+          />
+
+          <UiButton
             type="submit"
-            :disabled="loading"
-            class="w-full btn-primary py-3"
+            :loading="loading"
+            loading-text="Sending..."
+            block
+            size="lg"
           >
-            <span v-if="loading">Sending...</span>
-            <span v-else>Send Message</span>
-          </button>
+            Send Message
+          </UiButton>
         </form>
-      </div>
+      </UiCard>
 
       <!-- Contact Information -->
       <div class="space-y-8">
         <!-- Contact Details -->
-        <div class="card">
-          <h2 class="text-2xl font-semibold text-gray-900 mb-6">Get in Touch</h2>
+        <UiCard title="Get in Touch" variant="default" padding="lg">
           <div class="space-y-4">
             <div class="flex items-start space-x-3">
               <div class="w-6 h-6 text-blue-600 flex-shrink-0 mt-1">
@@ -151,22 +128,20 @@
               </div>
             </div>
           </div>
-        </div>
+        </UiCard>
 
         <!-- FAQ Link -->
-        <div class="card">
-          <h2 class="text-xl font-semibold text-gray-900 mb-4">Quick Help</h2>
+        <UiCard title="Quick Help" variant="default" padding="lg">
           <p class="text-gray-600 mb-4">
             Looking for immediate answers? Check out our FAQ section for solutions to common questions.
           </p>
-          <NuxtLink to="/help" class="btn-secondary">
+          <UiButton to="/help" variant="secondary">
             Browse FAQ
-          </NuxtLink>
-        </div>
+          </UiButton>
+        </UiCard>
 
         <!-- Alternative Contact -->
-        <div class="card">
-          <h2 class="text-xl font-semibold text-gray-900 mb-4">Other Ways to Reach Us</h2>
+        <UiCard title="Other Ways to Reach Us" variant="default" padding="lg">
           <div class="space-y-3">
             <div class="flex items-center space-x-2">
               <span class="w-2 h-2 bg-blue-600 rounded-full"></span>
@@ -181,7 +156,7 @@
               <span class="text-gray-600">Subscribe to our newsletter</span>
             </div>
           </div>
-        </div>
+        </UiCard>
       </div>
     </div>
   </div>
