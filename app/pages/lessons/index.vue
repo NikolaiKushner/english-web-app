@@ -27,9 +27,11 @@
     </div>
 
     <!-- Loading State -->
-    <div v-if="learningStore.loading" class="flex justify-center py-12">
-      <div class="animate-spin rounded-full h-12 w-12 border-b-2 border-blue-600"></div>
-    </div>
+    <LoadingSpinner 
+      v-if="learningStore.loading" 
+      size="lg" 
+      message="Loading lessons..." 
+    />
 
     <!-- Lessons Grid -->
     <div v-else-if="filteredLessons.length > 0" class="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6">

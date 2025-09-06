@@ -1,5 +1,25 @@
 import { defineStore } from 'pinia'
-import type { User } from '~/types'
+import type { User } from '@/types'
+
+// Helper function to get user-friendly error messages
+const getAuthErrorMessage = (error: any): string => {
+  switch (error.message) {
+    case 'Invalid login credentials':
+      return 'Invalid email or password. Please check your credentials and try again.'
+    case 'Email not confirmed':
+      return 'Please check your email and click the confirmation link before signing in.'
+    case 'User already registered':
+      return 'An account with this email already exists. Try signing in instead.'
+    case 'Password should be at least 6 characters':
+      return 'Password must be at least 6 characters long.'
+    case 'Unable to validate email address: invalid format':
+      return 'Please enter a valid email address.'
+    case 'signup is disabled':
+      return 'New account registration is currently disabled.'
+    default:
+      return error.message || 'An unexpected error occurred. Please try again.'
+  }
+}
 
 export const useAuthStore = defineStore('auth', () => {
   const user = ref<User | null>(null)
@@ -19,10 +39,15 @@ export const useAuthStore = defineStore('auth', () => {
         }
       })
       
-      if (error) throw error
+      if (error) {
+        console.error('Sign up error:', error)
+        throw new Error(getAuthErrorMessage(error))
+      }
+      
       return { data, error: null }
-    } catch (error) {
-      return { data: null, error }
+    } catch (error: any) {
+      const errorMessage = error.message || 'An unexpected error occurred during sign up'
+      return { data: null, error: { message: errorMessage } }
     } finally {
       loading.value = false
     }
@@ -36,10 +61,15 @@ export const useAuthStore = defineStore('auth', () => {
         password
       })
       
-      if (error) throw error
+      if (error) {
+        console.error('Sign in error:', error)
+        throw new Error(getAuthErrorMessage(error))
+      }
+      
       return { data, error: null }
-    } catch (error) {
-      return { data: null, error }
+    } catch (error: any) {
+      const errorMessage = error.message || 'An unexpected error occurred during sign in'
+      return { data: null, error: { message: errorMessage } }
     } finally {
       loading.value = false
     }
@@ -49,11 +79,15 @@ export const useAuthStore = defineStore('auth', () => {
     loading.value = true
     try {
       const { error } = await supabase.auth.signOut()
-      if (error) throw error
+      if (error) {
+        console.error('Sign out error:', error)
+        throw new Error('Failed to sign out. Please try again.')
+      }
       user.value = null
       return { error: null }
-    } catch (error) {
-      return { error }
+    } catch (error: any) {
+      const errorMessage = error.message || 'An unexpected error occurred during sign out'
+      return { error: { message: errorMessage } }
     } finally {
       loading.value = false
     }
@@ -62,11 +96,18 @@ export const useAuthStore = defineStore('auth', () => {
   const getCurrentUser = async () => {
     loading.value = true
     try {
-      const { data: { user: currentUser } } = await supabase.auth.getUser()
+      const { data: { user: currentUser }, error } = await supabase.auth.getUser()
+      
+      if (error) {
+        console.error('Error getting current user:', error)
+        throw error
+      }
+      
       user.value = currentUser as User | null
       return currentUser
     } catch (error) {
       console.error('Error getting current user:', error)
+      user.value = null
       return null
     } finally {
       loading.value = false

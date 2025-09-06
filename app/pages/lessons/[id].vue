@@ -1,9 +1,11 @@
 <template>
   <div class="max-w-4xl mx-auto px-4 sm:px-6 lg:px-8 py-8">
     <!-- Loading State -->
-    <div v-if="learningStore.loading" class="flex justify-center py-12">
-      <div class="animate-spin rounded-full h-12 w-12 border-b-2 border-blue-600"></div>
-    </div>
+    <LoadingSpinner 
+      v-if="learningStore.loading" 
+      size="lg" 
+      message="Loading lesson..." 
+    />
 
     <!-- Lesson Content -->
     <div v-else-if="lesson" class="space-y-8">
@@ -50,67 +52,12 @@
 
       <!-- Exercises Section -->
       <div v-if="exercises.length > 0" class="card">
-        <h2 class="text-2xl font-semibold text-gray-900 mb-4">Practice Exercises</h2>
-        <div class="space-y-4">
-          <div
-            v-for="(exercise, index) in exercises"
-            :key="exercise.id"
-            class="border border-gray-200 rounded-lg p-4"
-          >
-            <div class="flex items-start justify-between mb-2">
-              <h3 class="font-medium text-gray-900">Exercise {{ index + 1 }}</h3>
-              <span class="text-sm text-gray-500 capitalize">{{ exercise.type.replace('_', ' ') }}</span>
-            </div>
-            <p class="text-gray-700 mb-3">{{ exercise.question }}</p>
-            
-            <!-- Multiple Choice Options -->
-            <div v-if="exercise.type === 'multiple_choice' && exercise.options" class="space-y-2">
-              <label
-                v-for="(option, optionIndex) in exercise.options"
-                :key="optionIndex"
-                class="flex items-center space-x-2 cursor-pointer hover:bg-gray-50 p-2 rounded"
-              >
-                <input
-                  type="radio"
-                  :name="`exercise-${exercise.id}`"
-                  :value="option"
-                  class="text-blue-600"
-                />
-                <span>{{ option }}</span>
-              </label>
-            </div>
-
-            <!-- Fill in the Blank -->
-            <div v-else-if="exercise.type === 'fill_blank'" class="space-y-2">
-              <input
-                type="text"
-                :placeholder="'Enter your answer'"
-                class="input-field"
-              />
-            </div>
-
-            <!-- Translation -->
-            <div v-else-if="exercise.type === 'translation'" class="space-y-2">
-              <textarea
-                :placeholder="'Enter your translation'"
-                class="input-field h-20 resize-none"
-              ></textarea>
-            </div>
-          </div>
-        </div>
-
-        <div class="mt-6 flex justify-between">
-          <button class="btn-secondary">
-            Check Answers
-          </button>
-          <button
-            @click="completeLesson"
-            :disabled="learningStore.loading"
-            class="btn-primary"
-          >
-            Complete Lesson
-          </button>
-        </div>
+        <h2 class="text-2xl font-semibold text-gray-900 mb-6">Practice Exercises</h2>
+        <ExercisePlayer
+          :exercises="exercises"
+          :lesson-id="lesson.id"
+          @complete="handleExerciseComplete"
+        />
       </div>
 
       <!-- Navigation -->
@@ -123,7 +70,7 @@
         </NuxtLink>
         <button
           v-if="!learningStore.isLessonCompleted(lesson.id)"
-          @click="completeLesson"
+          @click="completeLesson()"
           :disabled="learningStore.loading"
           class="btn-primary"
         >
@@ -168,20 +115,34 @@ const formattedContent = computed(() => {
   return lesson.value.content.replace(/\n/g, '<br>')
 })
 
-const completeLesson = async () => {
+const completeLesson = async (score?: number) => {
   if (!authStore.user || !lesson.value) return
 
   const progressData = {
     user_id: authStore.user.id,
     lesson_id: lesson.value.id,
     completed: true,
+    score: score || 100,
     completed_at: new Date().toISOString()
   }
 
-  await learningStore.updateProgress(progressData)
+  const toast = useToast()
   
-  // Show success message or redirect
-  // You could add a toast notification here
+  try {
+    await learningStore.updateProgress(progressData)
+    toast.success('Lesson Completed!', `Great job! ${score ? `Score: ${score}%` : ''}`)
+    
+    // Optionally redirect to lessons page after a delay
+    setTimeout(() => {
+      navigateTo('/lessons')
+    }, 2000)
+  } catch (error) {
+    toast.error('Error', 'Failed to save progress. Please try again.')
+  }
+}
+
+const handleExerciseComplete = (score: number) => {
+  completeLesson(score)
 }
 
 // Fetch lesson data

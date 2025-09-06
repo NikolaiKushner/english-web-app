@@ -8,9 +8,11 @@
     </div>
 
     <!-- Loading State -->
-    <div v-if="learningStore.loading" class="flex justify-center py-12">
-      <div class="animate-spin rounded-full h-12 w-12 border-b-2 border-blue-600"></div>
-    </div>
+    <LoadingSpinner 
+      v-if="learningStore.loading" 
+      size="lg" 
+      message="Loading your progress..." 
+    />
 
     <!-- Progress Content -->
     <div v-else-if="authStore.user" class="space-y-8">
@@ -18,30 +20,30 @@
       <div class="grid grid-cols-1 md:grid-cols-4 gap-6">
         <div class="card text-center">
           <div class="text-3xl font-bold text-blue-600 mb-2">
-            {{ userProfile?.total_lessons_completed || 0 }}
+            {{ completedLessonsCount }}
           </div>
           <div class="text-sm text-gray-600">Lessons Completed</div>
         </div>
         
         <div class="card text-center">
           <div class="text-3xl font-bold text-green-600 mb-2">
-            {{ userProfile?.total_exercises_completed || 0 }}
+            {{ completedExercisesCount }}
           </div>
           <div class="text-sm text-gray-600">Exercises Completed</div>
         </div>
         
         <div class="card text-center">
           <div class="text-3xl font-bold text-purple-600 mb-2">
-            {{ userProfile?.streak_days || 0 }}
+            {{ currentStreak }}
           </div>
           <div class="text-sm text-gray-600">Day Streak</div>
         </div>
         
         <div class="card text-center">
           <div class="text-3xl font-bold text-orange-600 mb-2">
-            {{ userProfile?.current_level || 'Beginner' }}
+            {{ overallProgress }}%
           </div>
-          <div class="text-sm text-gray-600">Current Level</div>
+          <div class="text-sm text-gray-600">Overall Progress</div>
         </div>
       </div>
 
@@ -61,10 +63,10 @@
       <!-- Recent Activity -->
       <div class="card">
         <h2 class="text-xl font-semibold text-gray-900 mb-4">Recent Activity</h2>
-        <div v-if="recentProgress.length > 0" class="space-y-3">
+        <div v-if="recentActivityWithDetails.length > 0" class="space-y-3">
           <div
-            v-for="progress in recentProgress"
-            :key="progress.id"
+            v-for="activity in recentActivityWithDetails"
+            :key="activity.id"
             class="flex items-center justify-between p-3 bg-gray-50 rounded-lg"
           >
             <div class="flex items-center space-x-3">
@@ -75,15 +77,20 @@
               </div>
               <div>
                 <p class="font-medium text-gray-900">
-                  {{ progress.lesson_id ? 'Completed lesson' : 'Completed exercise' }}
+                  {{ activity.isExercise ? 'Completed exercise in' : 'Completed lesson:' }}
+                  <span class="text-blue-600">{{ activity.lessonTitle }}</span>
                 </p>
                 <p class="text-sm text-gray-500">
-                  {{ formatDate(progress.completed_at) }}
+                  {{ formatDate(activity.completed_at) }}
                 </p>
               </div>
             </div>
-            <div v-if="progress.score" class="text-sm font-medium text-green-600">
-              {{ progress.score }}%
+            <div v-if="activity.score" class="text-sm font-medium" :class="{
+              'text-green-600': activity.score >= 80,
+              'text-yellow-600': activity.score >= 60 && activity.score < 80,
+              'text-red-600': activity.score < 60
+            }">
+              {{ activity.score }}%
             </div>
           </div>
         </div>
@@ -138,11 +145,38 @@ const learningStore = useLearningStore()
 const authStore = useAuthStore()
 
 const userProfile = computed(() => learningStore.userProfile)
+
+// Enhanced computed properties using the new store functions
+const completedLessonsCount = computed(() => {
+  return learningStore.userProgress.filter(p => p.completed && !p.exercise_id).length
+})
+
+const completedExercisesCount = computed(() => {
+  return learningStore.userProgress.filter(p => p.completed && p.exercise_id).length
+})
+
+const currentStreak = computed(() => {
+  return learningStore.getStreakDays()
+})
+
+const overallProgress = computed(() => {
+  return learningStore.getOverallProgress()
+})
+
 const recentProgress = computed(() => {
-  return learningStore.userProgress
-    .filter(p => p.completed)
-    .sort((a, b) => new Date(b.completed_at || '').getTime() - new Date(a.completed_at || '').getTime())
-    .slice(0, 10)
+  return learningStore.getRecentActivity(10)
+})
+
+// Enhanced recent activity with lesson titles
+const recentActivityWithDetails = computed(() => {
+  return recentProgress.value.map(progress => {
+    const lesson = learningStore.lessons.find(l => l.id === progress.lesson_id)
+    return {
+      ...progress,
+      lessonTitle: lesson?.title || 'Unknown Lesson',
+      isExercise: !!progress.exercise_id
+    }
+  })
 })
 
 const achievements = ref([
@@ -191,6 +225,7 @@ const formatDate = (dateString: string) => {
 onMounted(async () => {
   if (authStore.user) {
     await Promise.all([
+      learningStore.fetchLessons(), // Need lessons for displaying titles
       learningStore.fetchUserProfile(authStore.user.id),
       learningStore.fetchUserProgress(authStore.user.id)
     ])

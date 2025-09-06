@@ -1,5 +1,5 @@
 import { defineStore } from 'pinia'
-import type { Lesson, Exercise, UserProgress, UserProfile } from '~/types'
+import type { Lesson, Exercise, UserProgress, UserProfile } from '@/types'
 
 export const useLearningStore = defineStore('learning', () => {
   const lessons = ref<Lesson[]>([])
@@ -147,6 +147,78 @@ export const useLearningStore = defineStore('learning', () => {
     return userProgress.value.find(p => p.exercise_id === exerciseId)
   }
 
+  const getLessonScore = (lessonId: string) => {
+    const lessonProgress = getLessonProgress(lessonId)
+    const exerciseProgress = lessonProgress.filter(p => p.exercise_id && p.completed)
+    
+    if (exerciseProgress.length === 0) return null
+    
+    const totalScore = exerciseProgress.reduce((sum, p) => sum + (p.score || 0), 0)
+    return Math.round(totalScore / exerciseProgress.length)
+  }
+
+  const getOverallProgress = () => {
+    const completedLessons = userProgress.value.filter(p => p.completed && !p.exercise_id).length
+    const totalLessons = lessons.value.length
+    
+    return totalLessons > 0 ? Math.round((completedLessons / totalLessons) * 100) : 0
+  }
+
+  const getStreakDays = () => {
+    if (!userProfile.value) return 0
+    
+    const lastActivity = userProfile.value.last_activity
+    if (!lastActivity) return 0
+    
+    const lastActivityDate = new Date(lastActivity)
+    const today = new Date()
+    const diffTime = today.getTime() - lastActivityDate.getTime()
+    const diffDays = Math.ceil(diffTime / (1000 * 60 * 60 * 24))
+    
+    // If last activity was today or yesterday, maintain streak
+    if (diffDays <= 1) {
+      return userProfile.value.streak_days
+    } else {
+      return 0 // Streak broken
+    }
+  }
+
+  const updateUserProfile = async (profileData: Partial<UserProfile>) => {
+    loading.value = true
+    try {
+      const { data, error } = await supabase
+        .from('user_profiles')
+        .upsert(profileData)
+        .select()
+        .single()
+      
+      if (error) throw error
+      
+      userProfile.value = data
+      return { data, error: null }
+    } catch (error) {
+      return { data: null, error }
+    } finally {
+      loading.value = false
+    }
+  }
+
+  const getRecentActivity = (limit: number = 10) => {
+    return userProgress.value
+      .filter(p => p.completed && p.completed_at)
+      .sort((a, b) => new Date(b.completed_at!).getTime() - new Date(a.completed_at!).getTime())
+      .slice(0, limit)
+  }
+
+  const getLessonsByLevel = (level: string) => {
+    return lessons.value.filter(lesson => lesson.level === level)
+  }
+
+  const getCompletedLessonsByLevel = (level: string) => {
+    const levelLessons = getLessonsByLevel(level)
+    return levelLessons.filter(lesson => isLessonCompleted(lesson.id))
+  }
+
   return {
     lessons: readonly(lessons),
     exercises: readonly(exercises),
@@ -159,8 +231,15 @@ export const useLearningStore = defineStore('learning', () => {
     fetchUserProgress,
     fetchUserProfile,
     updateProgress,
+    updateUserProfile,
     getLessonProgress,
     isLessonCompleted,
-    getExerciseProgress
+    getExerciseProgress,
+    getLessonScore,
+    getOverallProgress,
+    getStreakDays,
+    getRecentActivity,
+    getLessonsByLevel,
+    getCompletedLessonsByLevel
   }
 })

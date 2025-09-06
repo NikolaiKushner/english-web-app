@@ -12,7 +12,7 @@
             Learn English through engaging lessons, exercises, and personalized progress tracking. 
             Start your journey to fluency today.
           </p>
-          <!-- <div class="flex flex-col sm:flex-row gap-4 justify-center">
+          <div class="flex flex-col sm:flex-row gap-4 justify-center">
             <NuxtLink 
               v-if="!authStore?.user" 
               to="/auth/register" 
@@ -26,7 +26,7 @@
             >
               Browse Lessons
             </NuxtLink>
-          </div> -->
+          </div>
         </div>
       </div>
     </section>
