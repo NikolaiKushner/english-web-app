@@ -7,7 +7,6 @@ export default defineNuxtConfig({
     '@pinia/nuxt',
     '@vueuse/nuxt'
   ],
-  css: ['~/assets/css/main.css'],
   runtimeConfig: {
     public: {
       supabaseUrl: process.env.SUPABASE_URL,

@@ -12,9 +12,9 @@
             Learn English through engaging lessons, exercises, and personalized progress tracking. 
             Start your journey to fluency today.
           </p>
-          <div class="flex flex-col sm:flex-row gap-4 justify-center">
+          <!-- <div class="flex flex-col sm:flex-row gap-4 justify-center">
             <NuxtLink 
-              v-if="!authStore.user" 
+              v-if="!authStore?.user" 
               to="/auth/register" 
               class="bg-yellow-400 hover:bg-yellow-500 text-gray-900 font-bold py-3 px-8 rounded-lg text-lg transition-colors duration-200"
             >
@@ -26,7 +26,7 @@
             >
               Browse Lessons
             </NuxtLink>
-          </div>
+          </div> -->
         </div>
       </div>
     </section>
@@ -93,7 +93,7 @@
           Join thousands of students who are already improving their English skills with our platform.
         </p>
         <NuxtLink 
-          v-if="!authStore.user"
+          v-if="!authStore?.user"
           to="/auth/register" 
           class="bg-blue-600 hover:bg-blue-700 text-white font-bold py-3 px-8 rounded-lg text-lg transition-colors duration-200"
         >

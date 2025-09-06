@@ -26,7 +26,9 @@
         </nav>
 
         <!-- User Menu -->
-        <div class="flex items-center space-x-4">
+        <div
+          class="flex items-center space-x-4"
+        >
           <template v-if="authStore.user">
             <div class="flex items-center space-x-3">
               <span class="text-sm text-gray-700">
