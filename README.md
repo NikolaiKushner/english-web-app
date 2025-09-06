@@ -1,176 +1,125 @@
-# English Learning Platform
+# 🎓 English Learning Platform with AI
 
-A modern web application for learning English built with Nuxt 3, Supabase, and TypeScript.
+A modern, AI-powered English learning platform built with Nuxt 3, Supabase, and OpenAI.
 
-## Features
+## ✨ Features
 
-- 🎯 **Interactive Lessons**: Structured lessons from beginner to advanced levels
-- 📚 **Multiple Exercise Types**: Multiple choice, fill-in-the-blank, translation, and listening exercises
-- 📊 **Progress Tracking**: Monitor your learning journey with detailed progress reports
-- 🔐 **User Authentication**: Secure user registration and login with Supabase Auth
-- 📱 **Responsive Design**: Optimized for desktop, tablet, and mobile devices
-- 🎨 **Modern UI**: Clean and intuitive interface built with Tailwind CSS
+- 🤖 **AI-Powered Learning**: Generate unlimited custom exercises with ChatGPT
+- 🎯 **Interactive Lessons**: Structured content from beginner to advanced
+- 💡 **Smart Explanations**: AI provides detailed feedback and learning tips
+- 📊 **Progress Tracking**: Monitor your learning journey with analytics
+- 🔐 **Secure Authentication**: User accounts with Supabase Auth
+- 📱 **Responsive Design**: Works perfectly on all devices
 
-## Tech Stack
-
-- **Frontend**: Nuxt 3, Vue 3, TypeScript
-- **Styling**: Tailwind CSS
-- **Backend**: Supabase (PostgreSQL, Auth, Real-time)
-- **State Management**: Pinia
-- **Deployment**: Vercel/Netlify ready
-
-## Getting Started
+## 🚀 Quick Start
 
 ### Prerequisites
+- Node.js 20.19.0+
+- Supabase account
+- OpenAI API key (optional, for AI features)
 
-- Node.js 20.19.0 or higher
-- npm or yarn
-- A Supabase account
-
-### Installation
-
-1. **Clone the repository**
+### Setup
+1. **Clone & Install**
    ```bash
-   git clone <repository-url>
+   git clone <your-repo>
    cd gpt_english_web
-   ```
-
-2. **Install dependencies**
-   ```bash
    npm install
    ```
 
-3. **Set up Supabase**
-   - Create a new project at [supabase.com](https://supabase.com)
-   - Go to Settings > API to get your project URL and anon key
-   - Copy `.env.example` to `.env` and fill in your Supabase credentials:
-     ```env
-     SUPABASE_URL=your_supabase_project_url
-     SUPABASE_ANON_KEY=your_supabase_anon_key
-     ```
+2. **Environment Variables**
+   ```bash
+   cp .env.example .env
+   ```
+   Fill in your `.env` file:
+   ```env
+   SUPABASE_URL=your_supabase_url
+   SUPABASE_ANON_KEY=your_supabase_anon_key
+   OPENAI_API_KEY=your_openai_api_key  # Optional
+   ```
 
-4. **Set up the database**
-   - Go to your Supabase project dashboard
-   - Navigate to SQL Editor
-   - Run the SQL commands from `supabase-schema.sql` to create the database schema
+3. **Database Setup**
+   - Run `supabase-schema.sql` in your Supabase SQL Editor
 
-5. **Start the development server**
+4. **Start Development**
    ```bash
    npm run dev
    ```
+   Open http://localhost:3000
 
-6. **Open your browser**
-   Navigate to `http://localhost:3000`
+## 🎯 AI Features
 
-## Project Structure
+### Without OpenAI API Key
+- ✅ All basic learning features work
+- ✅ Pre-built lessons and exercises
+- ✅ Progress tracking
+- ❌ AI exercise generation disabled
+- ❌ AI explanations disabled
+
+### With OpenAI API Key
+- ✅ Generate unlimited custom exercises
+- ✅ AI-powered explanations and tips
+- ✅ Personalized learning feedback
+- ✅ Smart recommendations
+
+> **Note**: AI features gracefully degrade if OpenAI API is unavailable or quota exceeded.
+
+## 🛠️ Tech Stack
+
+- **Frontend**: Nuxt 3, Vue 3, TypeScript, Tailwind CSS
+- **Backend**: Supabase (PostgreSQL, Auth)
+- **AI**: OpenAI GPT-3.5-turbo
+- **State**: Pinia stores
+
+## 📁 Key Files
 
 ```
-├── assets/css/          # Global styles and Tailwind configuration
-├── components/          # Reusable Vue components
-├── composables/         # Vue composables (useSupabase, etc.)
-├── pages/              # Application pages and routing
-│   ├── auth/           # Authentication pages
-│   └── lessons/        # Lesson-related pages
-├── stores/             # Pinia stores for state management
-├── types/              # TypeScript type definitions
-├── app.vue             # Root component
-├── nuxt.config.ts      # Nuxt configuration
-└── supabase-schema.sql # Database schema
+app/
+├── components/
+│   ├── AIExerciseGenerator.vue    # AI exercise creator
+│   ├── ExercisePlayer.vue         # Enhanced with AI explanations
+│   └── Toast.vue                  # User notifications
+├── pages/
+│   ├── lessons/create.vue         # AI lesson builder
+│   └── lessons/[id].vue          # Lesson with AI feedback
+├── composables/
+│   └── useAI.ts                  # AI service integration
+└── server/api/ai/                # OpenAI API routes
 ```
 
-## Database Schema
+## 🔧 Commands
 
-The application uses the following main tables:
+```bash
+npm run dev        # Development server
+npm run build      # Production build
+npm run preview    # Preview build
+```
 
-- **users**: User profiles (extends Supabase auth.users)
-- **lessons**: Learning content organized by level and category
-- **exercises**: Practice exercises linked to lessons
-- **user_progress**: Tracks completion and scores
-- **user_profiles**: User learning statistics and preferences
+## 🚨 Troubleshooting
 
-## Features Overview
+### OpenAI Quota Exceeded Error
+If you see "429 You exceeded your current quota":
 
-### Authentication
-- User registration and login
-- Email verification
-- Password reset functionality
-- Protected routes
+1. **Check your OpenAI account**: Visit https://platform.openai.com/account/billing
+2. **Add payment method**: OpenAI requires billing setup for API access
+3. **Temporary workaround**: AI features will gracefully disable, basic app still works
 
-### Learning System
-- **Lessons**: Structured content with multiple difficulty levels
-- **Exercises**: Various types of practice activities
-- **Progress Tracking**: Monitor completion and performance
-- **Level System**: Beginner, Intermediate, Advanced
+### Common Issues
+- **Build errors**: Ensure Node.js 20.19.0+
+- **Supabase connection**: Verify URL and keys in `.env`
+- **TypeScript errors**: Run `npm run build` to check
 
-### User Interface
-- **Responsive Design**: Works on all device sizes
-- **Modern UI**: Clean, intuitive interface
-- **Accessibility**: WCAG compliant components
-- **Performance**: Optimized for fast loading
+## 📄 License
 
-## Development
+MIT License - see LICENSE file for details.
 
-### Available Scripts
-
-- `npm run dev` - Start development server
-- `npm run build` - Build for production
-- `npm run generate` - Generate static site
-- `npm run preview` - Preview production build
-
-### Code Style
-
-- TypeScript for type safety
-- ESLint for code linting
-- Prettier for code formatting
-- Vue 3 Composition API
-
-## Deployment
-
-### Vercel (Recommended)
-
-1. Connect your GitHub repository to Vercel
-2. Add environment variables in Vercel dashboard
-3. Deploy automatically on push to main branch
-
-### Netlify
-
-1. Connect your GitHub repository to Netlify
-2. Add environment variables in Netlify dashboard
-3. Deploy automatically on push to main branch
-
-### Manual Deployment
-
-1. Build the project: `npm run build`
-2. Upload the `.output` folder to your hosting provider
-3. Configure environment variables
-
-## Contributing
+## 🤝 Contributing
 
 1. Fork the repository
-2. Create a feature branch: `git checkout -b feature/new-feature`
-3. Commit your changes: `git commit -am 'Add new feature'`
-4. Push to the branch: `git push origin feature/new-feature`
-5. Submit a pull request
+2. Create feature branch: `git checkout -b feature/amazing-feature`
+3. Commit changes: `git commit -m 'Add amazing feature'`
+4. Push branch: `git push origin feature/amazing-feature`
+5. Open Pull Request
 
-## License
+---
 
-This project is licensed under the MIT License - see the LICENSE file for details.
-
-## Support
-
-If you encounter any issues or have questions, please:
-
-1. Check the [Issues](https://github.com/your-repo/issues) page
-2. Create a new issue with detailed information
-3. Contact the development team
-
-## Roadmap
-
-- [ ] Mobile app (React Native)
-- [ ] Advanced analytics dashboard
-- [ ] Social learning features
-- [ ] AI-powered personalized recommendations
-- [ ] Offline learning support
-- [ ] Multi-language support
-- [ ] Gamification elements
-- [ ] Video lessons integration
+**Ready to learn English with AI?** 🚀 Start with `npm run dev` and visit http://localhost:3000

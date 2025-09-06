@@ -130,7 +130,43 @@
             }">
               {{ exerciseResults[exercise.id]?.isCorrect ? 'Correct!' : 'Incorrect' }}
             </p>
-            <p v-if="exercise.explanation" class="text-sm mt-1" :class="{
+            
+            <!-- AI Explanation (prioritized) -->
+            <div v-if="exerciseResults[exercise.id]?.aiExplanation" class="mt-2 space-y-2">
+              <p class="text-sm" :class="{
+                'text-green-700': exerciseResults[exercise.id]?.isCorrect,
+                'text-red-700': !exerciseResults[exercise.id]?.isCorrect
+              }">
+                <strong>AI Explanation:</strong> {{ exerciseResults[exercise.id]?.aiExplanation?.explanation }}
+              </p>
+              
+              <!-- AI Tips -->
+              <div v-if="exerciseResults[exercise.id]?.aiExplanation?.tips.length > 0" class="text-sm">
+                <strong class="text-blue-700">💡 Tips:</strong>
+                <ul class="list-disc list-inside mt-1 space-y-1 text-blue-600">
+                  <li v-for="tip in exerciseResults[exercise.id]?.aiExplanation?.tips" :key="tip">
+                    {{ tip }}
+                  </li>
+                </ul>
+              </div>
+              
+              <!-- Related Concepts -->
+              <div v-if="exerciseResults[exercise.id]?.aiExplanation?.relatedConcepts.length > 0" class="text-sm">
+                <strong class="text-purple-700">📚 Related Concepts:</strong>
+                <div class="flex flex-wrap gap-1 mt-1">
+                  <span 
+                    v-for="concept in exerciseResults[exercise.id]?.aiExplanation?.relatedConcepts" 
+                    :key="concept"
+                    class="bg-purple-100 text-purple-800 text-xs px-2 py-1 rounded-full"
+                  >
+                    {{ concept }}
+                  </span>
+                </div>
+              </div>
+            </div>
+            
+            <!-- Fallback to original explanation if no AI explanation -->
+            <p v-else-if="exercise.explanation" class="text-sm mt-1" :class="{
               'text-green-700': exerciseResults[exercise.id]?.isCorrect,
               'text-red-700': !exerciseResults[exercise.id]?.isCorrect
             }">
@@ -198,6 +234,11 @@ interface ExerciseResult {
   isCorrect: boolean
   score: number
   userAnswer: string
+  aiExplanation?: {
+    explanation: string
+    tips: string[]
+    relatedConcepts: string[]
+  }
 }
 
 interface Props {
@@ -213,6 +254,7 @@ const emit = defineEmits<{
 const toast = useToast()
 const authStore = useAuthStore()
 const learningStore = useLearningStore()
+const aiService = useAI()
 
 const userAnswers = ref<Record<string, string>>({})
 const exerciseResults = ref<Record<string, ExerciseResult>>({})
@@ -237,6 +279,28 @@ const checkSingleExercise = async (exercise: Exercise) => {
   loading.value = true
   try {
     const result = evaluateAnswer(exercise, userAnswer)
+    
+    // Get AI explanation for the answer
+    try {
+      const aiExplanation = await aiService.explainAnswer(
+        exercise.question,
+        userAnswer,
+        exercise.correct_answer,
+        exercise.type,
+        'intermediate', // You could get this from user profile
+        exercise.options
+      )
+      
+      result.aiExplanation = {
+        explanation: aiExplanation.explanation,
+        tips: aiExplanation.tips,
+        relatedConcepts: aiExplanation.relatedConcepts
+      }
+    } catch (aiError) {
+      console.warn('AI explanation failed, using fallback:', aiError)
+      // Continue without AI explanation - the basic explanation will still work
+    }
+    
     exerciseResults.value[exercise.id] = result
 
     // Save progress to database
@@ -251,11 +315,11 @@ const checkSingleExercise = async (exercise: Exercise) => {
       })
     }
 
-    // Show feedback
+    // Show enhanced feedback
     if (result.isCorrect) {
-      toast.success('Correct!', exercise.explanation || 'Well done!')
+      toast.success('Correct!', result.aiExplanation?.explanation || exercise.explanation || 'Well done!')
     } else {
-      toast.error('Incorrect', 'Check the explanation and try again.')
+      toast.error('Incorrect', 'Check the AI explanation below for detailed feedback.')
     }
 
   } catch (error) {

@@ -31,15 +31,93 @@
       </div>
     </section>
 
+    <!-- AI Features Section -->
+    <section class="py-20 bg-gradient-to-br from-purple-50 to-blue-50">
+      <div class="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
+        <div class="text-center mb-16">
+          <div class="flex items-center justify-center space-x-2 mb-4">
+            <div class="w-8 h-8 bg-purple-100 rounded-full flex items-center justify-center">
+              <svg class="w-4 h-4 text-purple-600" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M13 10V3L4 14h7v7l9-11h-7z"></path>
+              </svg>
+            </div>
+            <span class="text-purple-600 font-semibold text-sm uppercase tracking-wide">AI-Powered Learning</span>
+          </div>
+          <h2 class="text-3xl md:text-4xl font-bold text-gray-900 mb-4">
+            Learn English with Artificial Intelligence
+          </h2>
+          <p class="text-xl text-gray-600 max-w-3xl mx-auto">
+            Experience personalized learning with AI that adapts to your needs, creates custom exercises, and provides intelligent feedback
+          </p>
+        </div>
+
+        <div class="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-8">
+          <div class="bg-white rounded-xl shadow-lg p-6 border border-purple-100">
+            <div class="w-12 h-12 bg-purple-100 rounded-lg flex items-center justify-center mb-4">
+              <svg class="w-6 h-6 text-purple-600" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M9.663 17h4.673M12 3v1m6.364 1.636l-.707.707M21 12h-1M4 12H3m3.343-5.657l-.707-.707m2.828 9.9a5 5 0 117.072 0l-.548.547A3.374 3.374 0 0014 18.469V19a2 2 0 11-4 0v-.531c0-.895-.356-1.754-.988-2.386l-.548-.547z"></path>
+              </svg>
+            </div>
+            <h3 class="text-xl font-semibold text-gray-900 mb-3">Smart Exercise Generation</h3>
+            <p class="text-gray-600 mb-4">
+              AI creates unlimited personalized exercises based on your interests, level, and learning goals.
+            </p>
+            <div class="text-sm text-purple-600 font-medium">
+              ✨ Unlimited custom content
+            </div>
+          </div>
+
+          <div class="bg-white rounded-xl shadow-lg p-6 border border-blue-100">
+            <div class="w-12 h-12 bg-blue-100 rounded-lg flex items-center justify-center mb-4">
+              <svg class="w-6 h-6 text-blue-600" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M8 12h.01M12 12h.01M16 12h.01M21 12c0 4.418-4.03 8-9 8a9.863 9.863 0 01-4.255-.949L3 20l1.395-3.72C3.512 15.042 3 13.574 3 12c0-4.418 4.03-8 9-8s9 3.582 9 8z"></path>
+              </svg>
+            </div>
+            <h3 class="text-xl font-semibold text-gray-900 mb-3">Intelligent Explanations</h3>
+            <p class="text-gray-600 mb-4">
+              Get detailed AI explanations for every answer with learning tips and related concepts.
+            </p>
+            <div class="text-sm text-blue-600 font-medium">
+              🧠 Personalized feedback
+            </div>
+          </div>
+
+          <div class="bg-white rounded-xl shadow-lg p-6 border border-green-100">
+            <div class="w-12 h-12 bg-green-100 rounded-lg flex items-center justify-center mb-4">
+              <svg class="w-6 h-6 text-green-600" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M9 19v-6a2 2 0 00-2-2H5a2 2 0 00-2 2v6a2 2 0 002 2h2a2 2 0 002-2zm0 0V9a2 2 0 012-2h2a2 2 0 012 2v10m-6 0a2 2 0 002 2h2a2 2 0 002-2m0 0V5a2 2 0 012-2h2a2 2 0 012 2v14a2 2 0 01-2 2h-2a2 2 0 01-2-2z"></path>
+              </svg>
+            </div>
+            <h3 class="text-xl font-semibold text-gray-900 mb-3">Adaptive Learning Path</h3>
+            <p class="text-gray-600 mb-4">
+              AI analyzes your progress and suggests the most effective next steps for your learning journey.
+            </p>
+            <div class="text-sm text-green-600 font-medium">
+              📈 Smart recommendations
+            </div>
+          </div>
+        </div>
+
+        <div class="text-center mt-12">
+          <NuxtLink to="/lessons/create" class="bg-purple-600 hover:bg-purple-700 text-white font-bold py-4 px-8 rounded-lg text-lg transition-colors duration-200 inline-flex items-center space-x-2">
+            <svg class="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+              <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M13 10V3L4 14h7v7l9-11h-7z"></path>
+            </svg>
+            <span>Try AI Exercise Creator</span>
+          </NuxtLink>
+        </div>
+      </div>
+    </section>
+
     <!-- Features Section -->
     <section class="py-20 bg-white">
       <div class="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
         <div class="text-center mb-16">
           <h2 class="text-3xl md:text-4xl font-bold text-gray-900 mb-4">
-            Why Choose Our Platform?
+            Complete Learning Platform
           </h2>
           <p class="text-xl text-gray-600 max-w-2xl mx-auto">
-            We provide everything you need to master English at your own pace
+            Traditional structured learning combined with cutting-edge AI technology
           </p>
         </div>
 

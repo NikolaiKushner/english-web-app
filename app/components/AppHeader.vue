@@ -20,6 +20,12 @@
           <NuxtLink to="/lessons" class="text-gray-700 hover:text-blue-600 px-3 py-2 rounded-md text-sm font-medium">
             Lessons
           </NuxtLink>
+          <NuxtLink to="/lessons/create" class="text-purple-700 hover:text-purple-600 px-3 py-2 rounded-md text-sm font-medium flex items-center space-x-1">
+            <svg class="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+              <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M13 10V3L4 14h7v7l9-11h-7z"></path>
+            </svg>
+            <span>AI Creator</span>
+          </NuxtLink>
           <NuxtLink to="/progress" class="text-gray-700 hover:text-blue-600 px-3 py-2 rounded-md text-sm font-medium">
             Progress
           </NuxtLink>

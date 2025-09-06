@@ -141,8 +141,43 @@ const completeLesson = async (score?: number) => {
   }
 }
 
-const handleExerciseComplete = (score: number) => {
+const handleExerciseComplete = async (score: number) => {
+  // Generate AI feedback before completing the lesson
+  await generateAIFeedback(score)
   completeLesson(score)
+}
+
+const generateAIFeedback = async (score: number) => {
+  if (!authStore.user || !lesson.value) return
+  
+  try {
+    const aiService = useAI()
+    
+    // Prepare user progress data
+    const userProgress = {
+      completedExercises: exercises.value.length,
+      totalExercises: exercises.value.length,
+      averageScore: score,
+      weakAreas: score < 70 ? [lesson.value.category] : [],
+      strongAreas: score >= 80 ? [lesson.value.category] : []
+    }
+    
+    const feedback = await aiService.generateFeedback(
+      lesson.value.title,
+      userProgress,
+      lesson.value.level as 'beginner' | 'intermediate' | 'advanced'
+    )
+    
+    // Show AI feedback in a toast
+    toast.success(feedback.motivationalMessage, feedback.specificFeedback)
+    
+    // You could also display this in a modal or dedicated feedback section
+    console.log('AI Feedback:', feedback)
+    
+  } catch (error) {
+    console.warn('AI feedback generation failed:', error)
+    // Continue without AI feedback
+  }
 }
 
 // Fetch lesson data
