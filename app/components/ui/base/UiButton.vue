@@ -75,7 +75,7 @@ const spinnerSizes = {
   xl: 'md'
 }
 
-const spinnerSize = computed(() => spinnerSizes[props.size])
+const spinnerSize = computed<keyof typeof spinnerSizes>(() => spinnerSizes[props.size] as keyof typeof spinnerSizes)
 
 // Variant configurations
 const variantClasses = {

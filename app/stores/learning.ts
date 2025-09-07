@@ -15,7 +15,7 @@ export const useLearningStore = defineStore('learning', () => {
       let query = supabase
         .from('lessons')
         .select('*')
-        .order('order', { ascending: true })
+        .order('"order"', { ascending: true })
       
       if (level) {
         query = query.eq('level', level)
@@ -58,7 +58,7 @@ export const useLearningStore = defineStore('learning', () => {
         .from('exercises')
         .select('*')
         .eq('lesson_id', lessonId)
-        .order('order', { ascending: true })
+        .order('"order"', { ascending: true })
       
       if (error) throw error
       exercises.value = data || []

@@ -43,6 +43,30 @@ export const useAuthStore = defineStore('auth', () => {
         console.error('Sign up error:', error)
         throw new Error(getAuthErrorMessage(error))
       }
+
+      // Create user profile in our public.users table
+      if (data.user) {
+        try {
+          await supabase
+            .from('users')
+            .insert({
+              id: data.user.id,
+              email: data.user.email!,
+              name: name || '',
+              avatar_url: data.user.user_metadata?.avatar_url || ''
+            })
+
+          // Create user profile
+          await supabase
+            .from('user_profiles')
+            .insert({
+              user_id: data.user.id
+            })
+        } catch (profileError) {
+          console.warn('Failed to create user profile:', profileError)
+          // Don't fail the signup if profile creation fails
+        }
+      }
       
       return { data, error: null }
     } catch (error: any) {

@@ -1,5 +1,34 @@
 <template>
-  <div class="max-w-4xl mx-auto px-4 sm:px-6 lg:px-8 py-8">
+  <!-- Authentication Guard -->
+  <div v-if="!authStore.user" class="min-h-screen flex items-center justify-center bg-gray-50">
+    <div class="max-w-md w-full space-y-8 text-center">
+      <div>
+        <div class="mx-auto h-12 w-12 bg-blue-100 rounded-full flex items-center justify-center">
+          <svg class="h-6 w-6 text-blue-600" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+            <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 15v2m-6 4h12a2 2 0 002-2v-6a2 2 0 00-2-2H6a2 2 0 00-2 2v6a2 2 0 002 2zm10-10V7a4 4 0 00-8 0v4h8z"></path>
+          </svg>
+        </div>
+        <h2 class="mt-6 text-3xl font-bold text-gray-900">Access Required</h2>
+        <p class="mt-2 text-sm text-gray-600">
+          Please sign in to access this lesson and continue your learning journey.
+        </p>
+      </div>
+      <div class="space-y-4">
+        <UiButton to="/auth/login" variant="primary" size="lg" class="w-full">
+          Sign In
+        </UiButton>
+        <UiButton to="/auth/register" variant="secondary" size="lg" class="w-full">
+          Create Account
+        </UiButton>
+        <UiButton to="/lessons" variant="ghost" size="lg" class="w-full">
+          ← Back to Lessons
+        </UiButton>
+      </div>
+    </div>
+  </div>
+
+  <!-- Main Content (only for authenticated users) -->
+  <div v-else class="max-w-4xl mx-auto px-4 sm:px-6 lg:px-8 py-8">
     <!-- Loading State -->
     <UiLoadingSpinner 
       v-if="learningStore.loading" 
@@ -44,7 +73,79 @@
       </UiCard>
 
       <!-- Lesson Content -->
-      <UiCard title="Lesson Content" variant="default" padding="lg">
+      <div v-if="lessonContent.length > 0" class="space-y-6">
+        <div
+          v-for="(content, index) in lessonContent"
+          :key="content.id"
+          class="lesson-content-block"
+        >
+          <!-- Text Content -->
+          <UiCard v-if="content.type === 'text'" variant="default" padding="lg">
+            <div class="prose max-w-none" v-html="formatMarkdown(content.content)"></div>
+          </UiCard>
+
+          <!-- Image Content -->
+          <UiCard v-else-if="content.type === 'image'" variant="default" padding="lg">
+            <div class="text-center">
+              <img 
+                :src="content.content" 
+                :alt="content.metadata?.alt || 'Lesson image'"
+                class="max-w-full h-auto rounded-lg mx-auto"
+              />
+              <p v-if="content.metadata?.caption" class="text-sm text-gray-600 mt-2">
+                {{ content.metadata.caption }}
+              </p>
+            </div>
+          </UiCard>
+
+          <!-- Video Content -->
+          <UiCard v-else-if="content.type === 'video'" variant="default" padding="lg">
+            <div class="aspect-w-16 aspect-h-9">
+              <video 
+                :src="content.content"
+                controls
+                class="w-full rounded-lg"
+              >
+                Your browser does not support the video tag.
+              </video>
+            </div>
+            <p v-if="content.metadata?.caption" class="text-sm text-gray-600 mt-2">
+              {{ content.metadata.caption }}
+            </p>
+          </UiCard>
+
+          <!-- Audio Content -->
+          <UiCard v-else-if="content.type === 'audio'" variant="default" padding="lg">
+            <div class="flex items-center space-x-4 p-4 bg-gray-50 rounded-lg">
+              <div class="w-12 h-12 bg-blue-100 rounded-full flex items-center justify-center">
+                <svg class="w-6 h-6 text-blue-600" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                  <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M15.536 8.464a5 5 0 010 7.072m2.828-9.9a9 9 0 010 14.142M9 9a3 3 0 000 6v-6z"></path>
+                </svg>
+              </div>
+              <div class="flex-1">
+                <audio 
+                  :src="content.content"
+                  controls
+                  class="w-full"
+                >
+                  Your browser does not support the audio tag.
+                </audio>
+                <p v-if="content.metadata?.caption" class="text-sm text-gray-600 mt-1">
+                  {{ content.metadata.caption }}
+                </p>
+              </div>
+            </div>
+          </UiCard>
+
+          <!-- Interactive Content -->
+          <UiCard v-else-if="content.type === 'interactive'" variant="default" padding="lg">
+            <InteractiveContent :content="content" />
+          </UiCard>
+        </div>
+      </div>
+
+      <!-- Fallback to legacy content -->
+      <UiCard v-else title="Lesson Content" variant="default" padding="lg">
         <div class="prose max-w-none" v-html="formattedContent"></div>
       </UiCard>
 
@@ -110,6 +211,7 @@ const authStore = useAuthStore()
 const lessonId = route.params.id as string
 const lesson = ref(null)
 const exercises = ref([])
+const lessonContent = ref([])
 
 const levelColors = {
   beginner: 'bg-green-100 text-green-800',
@@ -134,6 +236,31 @@ const formattedContent = computed(() => {
   if (!lesson.value?.content) return ''
   return lesson.value.content.replace(/\n/g, '<br>')
 })
+
+// Simple markdown formatter
+const formatMarkdown = (content: string) => {
+  if (!content) return ''
+  
+  return content
+    // Headers
+    .replace(/^### (.*$)/gm, '<h3 class="text-lg font-semibold text-gray-900 mb-3 mt-6">$1</h3>')
+    .replace(/^## (.*$)/gm, '<h2 class="text-xl font-semibold text-gray-900 mb-4 mt-8">$1</h2>')
+    .replace(/^# (.*$)/gm, '<h1 class="text-2xl font-bold text-gray-900 mb-6 mt-8">$1</h1>')
+    // Bold and italic
+    .replace(/\*\*(.*?)\*\*/g, '<strong class="font-semibold text-gray-900">$1</strong>')
+    .replace(/\*(.*?)\*/g, '<em class="italic">$1</em>')
+    // Lists
+    .replace(/^- (.*$)/gm, '<li class="ml-4">$1</li>')
+    .replace(/(<li.*<\/li>)/s, '<ul class="list-disc list-inside space-y-1 mb-4">$1</ul>')
+    // Line breaks
+    .replace(/\n\n/g, '</p><p class="mb-4">')
+    .replace(/\n/g, '<br>')
+    // Wrap in paragraph tags
+    .replace(/^(?!<[h|u|l])/gm, '<p class="mb-4">')
+    .replace(/(?<!>)$/gm, '</p>')
+    // Clean up extra tags
+    .replace(/<p class="mb-4"><\/p>/g, '')
+}
 
 const completeLesson = async (score?: number) => {
   if (!authStore.user || !lesson.value) return
@@ -200,12 +327,35 @@ const generateAIFeedback = async (score: number) => {
   }
 }
 
+// Fetch lesson content from database
+const fetchLessonContent = async (lessonId: string) => {
+  try {
+    const { supabase } = useSupabase()
+    const { data, error } = await supabase
+      .from('lesson_content')
+      .select('*')
+      .eq('lesson_id', lessonId)
+      .order('"order"', { ascending: true })
+
+    if (error) throw error
+    return data || []
+  } catch (error) {
+    console.error('Error fetching lesson content:', error)
+    return []
+  }
+}
+
 // Fetch lesson data
 onMounted(async () => {
   const { data: lessonData } = await learningStore.fetchLesson(lessonId)
   lesson.value = lessonData
 
   if (lessonData) {
+    // Fetch structured lesson content
+    const contentData = await fetchLessonContent(lessonId)
+    lessonContent.value = contentData
+
+    // Fetch exercises
     const { data: exercisesData } = await learningStore.fetchExercises(lessonId)
     exercises.value = exercisesData || []
 

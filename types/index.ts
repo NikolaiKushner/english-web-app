@@ -55,3 +55,43 @@ export interface UserProfile {
   created_at: string
   updated_at: string
 }
+
+export interface VocabularyWord {
+  id: string
+  word: string
+  definition: string
+  pronunciation?: string
+  part_of_speech: string
+  example_sentence: string
+  difficulty_level: 'beginner' | 'intermediate' | 'advanced'
+  category: string
+  audio_url?: string
+  image_url?: string
+  created_at: string
+  updated_at: string
+}
+
+export interface UserVocabulary {
+  id: string
+  user_id: string
+  word_id: string
+  mastery_level: number // 0-5 scale
+  times_reviewed: number
+  last_reviewed: string
+  next_review: string
+  is_favorite: boolean
+  created_at: string
+  updated_at: string
+  word?: VocabularyWord
+}
+
+export interface LessonContent {
+  id: string
+  lesson_id: string
+  type: 'text' | 'image' | 'video' | 'audio' | 'interactive'
+  content: string
+  order: number
+  metadata?: Record<string, any>
+  created_at: string
+  updated_at: string
+}

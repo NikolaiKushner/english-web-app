@@ -23,12 +23,31 @@
               Get Started Free
             </UiButton>
             <UiButton 
-              to="/lessons" 
+              v-if="!authStore?.user"
+              to="/auth/login" 
               variant="ghost"
               size="xl"
               class="border-2 border-white hover:bg-white hover:text-blue-600 text-white"
             >
-              Browse Lessons
+              Sign In
+            </UiButton>
+            <UiButton 
+              v-if="authStore?.user"
+              to="/lessons" 
+              variant="primary"
+              size="xl"
+              class="bg-white text-blue-600 hover:bg-gray-100"
+            >
+              Start Learning
+            </UiButton>
+            <UiButton 
+              v-if="authStore?.user"
+              to="/vocabulary" 
+              variant="ghost"
+              size="xl"
+              class="border-2 border-white hover:bg-white hover:text-blue-600 text-white"
+            >
+              Dictionary
             </UiButton>
           </div>
         </div>
