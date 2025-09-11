@@ -256,7 +256,7 @@ const emit = defineEmits<{
 }>()
 
 const toast = useToast()
-const authStore = useAuthStore()
+const user = useSupabaseUser()
 const learningStore = useLearningStore()
 const aiService = useAI()
 
@@ -308,9 +308,9 @@ const checkSingleExercise = async (exercise: Exercise) => {
     exerciseResults.value[exercise.id] = result
 
     // Save progress to database
-    if (authStore.user) {
+    if (user.value) {
       await learningStore.updateProgress({
-        user_id: authStore.user.id,
+        user_id: user.value?.id,
         lesson_id: props.lessonId,
         exercise_id: exercise.id,
         completed: true,
@@ -343,9 +343,9 @@ const checkAllExercises = async () => {
         exerciseResults.value[exercise.id] = result
 
         // Save progress to database
-        if (authStore.user) {
+        if (user.value) {
           await learningStore.updateProgress({
-            user_id: authStore.user.id,
+            user_id: user.value?.id,
             lesson_id: props.lessonId,
             exercise_id: exercise.id,
             completed: true,

@@ -51,7 +51,7 @@
 
         <UiButton
           type="submit"
-          :loading="authStore.loading"
+          :loading="loading"
           loading-text="Signing in..."
           block
           size="lg"
@@ -65,8 +65,8 @@
 </template>
 
 <script setup lang="ts">
-const authStore = useAuthStore()
-const router = useRouter()
+const supabase = useSupabaseClient()
+const user = useSupabaseUser()
 
 const form = reactive({
   email: '',
@@ -74,6 +74,7 @@ const form = reactive({
 })
 
 const error = ref('')
+const loading = ref(false)
 
 const handleLogin = async () => {
   error.value = ''
@@ -83,23 +84,26 @@ const handleLogin = async () => {
     return
   }
 
-  const { data, error: loginError } = await authStore.signIn(form.email, form.password)
+  loading.value = true
+
+  const { data, error: loginError } = await supabase.auth.signInWithPassword({
+    email: form.email,
+    password: form.password,
+  })
   
   if (loginError) {
     error.value = loginError.message || 'An error occurred during login'
-  } else {
-    await router.push('/')
   }
+
+  loading.value = false
 }
 
-// Redirect if already logged in
-watch(() => authStore.user, (user) => {
-  if (user) {
-    router.push('/')
+watchEffect(() => {
+  if (user.value) {
+    return navigateTo('/')
   }
-}, { immediate: true })
+})
 
-// Set page meta
 useHead({
   title: 'Sign In - English Learning Platform'
 })

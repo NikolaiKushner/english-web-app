@@ -1,34 +1,5 @@
 <template>
-  <!-- Authentication Guard -->
-  <div v-if="!authStore.user" class="min-h-screen flex items-center justify-center bg-gray-50">
-    <div class="max-w-md w-full space-y-8 text-center">
-      <div>
-        <div class="mx-auto h-12 w-12 bg-indigo-100 rounded-full flex items-center justify-center">
-          <svg class="h-6 w-6 text-indigo-600" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-            <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M9 19v-6a2 2 0 00-2-2H5a2 2 0 00-2 2v6a2 2 0 002 2h2a2 2 0 002-2zm0 0V9a2 2 0 012-2h2a2 2 0 012 2v10m-6 0a2 2 0 002 2h2a2 2 0 002-2m0 0V5a2 2 0 012-2h2a2 2 0 012 2v14a2 2 0 01-2 2h-2a2 2 0 01-2-2z"></path>
-          </svg>
-        </div>
-        <h2 class="mt-6 text-3xl font-bold text-gray-900">Progress Tracking Access Required</h2>
-        <p class="mt-2 text-sm text-gray-600">
-          Please sign in to view your learning progress and track your achievements.
-        </p>
-      </div>
-      <div class="space-y-4">
-        <UiButton to="/auth/login" variant="primary" size="lg" class="w-full">
-          Sign In
-        </UiButton>
-        <UiButton to="/auth/register" variant="secondary" size="lg" class="w-full">
-          Create Account
-        </UiButton>
-        <UiButton to="/" variant="ghost" size="lg" class="w-full">
-          ← Back to Home
-        </UiButton>
-      </div>
-    </div>
-  </div>
-
-  <!-- Main Content (only for authenticated users) -->
-  <div v-else class="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-8">
+  <div class="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-8">
     <div class="mb-8">
       <h1 class="text-3xl font-bold text-gray-900 mb-4">Your Learning Progress</h1>
       <p class="text-lg text-gray-600">
@@ -44,7 +15,7 @@
     />
 
     <!-- Progress Content -->
-    <div v-else-if="authStore.user" class="space-y-8">
+    <div v-else-if="user" class="space-y-8">
       <!-- Stats Overview -->
       <div class="grid grid-cols-1 md:grid-cols-4 gap-6">
         <UiCard variant="default" padding="md" class="text-center">
@@ -180,32 +151,12 @@
         </div>
       </UiCard>
     </div>
-
-    <!-- Not Logged In -->
-    <div v-else class="text-center py-12">
-      <UiAlert
-        variant="info"
-        title="Sign in to track your progress"
-        message="Create an account or sign in to start tracking your learning journey."
-        class="max-w-md mx-auto mb-6"
-      />
-      <div class="flex justify-center space-x-4">
-        <UiButton to="/auth/login" variant="secondary">
-          Sign In
-        </UiButton>
-        <UiButton to="/auth/register" variant="primary">
-          Sign Up
-        </UiButton>
-      </div>
-    </div>
   </div>
 </template>
 
 <script setup lang="ts">
 const learningStore = useLearningStore()
-const authStore = useAuthStore()
-
-const userProfile = computed(() => learningStore.userProfile)
+const user = useSupabaseUser()
 
 // Enhanced computed properties using the new store functions
 const completedLessonsCount = computed(() => {
@@ -288,11 +239,11 @@ const formatDate = (dateString: string) => {
 
 // Fetch user data on component mount
 onMounted(async () => {
-  if (authStore.user) {
+  if (user.value) {
     await Promise.all([
       learningStore.fetchLessons(), // Need lessons for displaying titles
-      learningStore.fetchUserProfile(authStore.user.id),
-      learningStore.fetchUserProgress(authStore.user.id)
+      learningStore.fetchUserProfile(user.value?.id),
+      learningStore.fetchUserProgress(user.value?.id)
     ])
   }
 })

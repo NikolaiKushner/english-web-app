@@ -14,7 +14,7 @@
 
         <!-- Navigation -->
         <nav class="hidden md:flex space-x-8">
-          <template v-if="authStore.user">
+          <template v-if="user">
             <NuxtLink to="/lessons" class="text-gray-700 hover:text-blue-600 px-3 py-2 rounded-md text-sm font-medium">
               Lessons
             </NuxtLink>
@@ -40,7 +40,7 @@
         <div
           class="flex items-center space-x-4"
         >
-          <template v-if="authStore.user">
+          <template v-if="user">
             <div class="flex items-center space-x-3">
               <NuxtLink 
                 to="/admin" 
@@ -54,12 +54,12 @@
                 <span class="hidden lg:inline">Admin</span>
               </NuxtLink>
               <span class="text-sm text-gray-700">
-                Welcome, {{ authStore.user.name || authStore.user.email }}
+                Welcome, {{ user?.user_metadata?.name || user?.email }}
               </span>
               <button
                 @click="handleSignOut"
                 class="btn-secondary text-sm"
-                :disabled="authStore.loading"
+                :disabled="loading"
               >
                 Sign Out
               </button>
@@ -80,10 +80,15 @@
 </template>
 
 <script setup lang="ts">
-const authStore = useAuthStore()
+const user = useSupabaseUser()
+const client = useSupabaseClient()
+
+const loading = ref(false)
 
 const handleSignOut = async () => {
-  await authStore.signOut()
+  loading.value = true
+  await client.auth.signOut()
   await navigateTo('/')
+  loading.value = false
 }
 </script>

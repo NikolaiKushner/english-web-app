@@ -14,7 +14,7 @@
           </p>
           <div class="flex flex-col sm:flex-row gap-4 justify-center">
             <UiButton 
-              v-if="!authStore?.user" 
+              v-if="!user" 
               to="/auth/register" 
               variant="warning"
               size="xl"
@@ -23,7 +23,7 @@
               Get Started Free
             </UiButton>
             <UiButton 
-              v-if="!authStore?.user"
+              v-if="!user"
               to="/auth/login" 
               variant="ghost"
               size="xl"
@@ -32,7 +32,7 @@
               Sign In
             </UiButton>
             <UiButton 
-              v-if="authStore?.user"
+              v-if="user"
               to="/lessons" 
               variant="primary"
               size="xl"
@@ -41,7 +41,7 @@
               Start Learning
             </UiButton>
             <UiButton 
-              v-if="authStore?.user"
+              v-if="user"
               to="/vocabulary" 
               variant="ghost"
               size="xl"
@@ -201,7 +201,7 @@
           Join thousands of students who are already improving their English skills with our platform.
         </p>
         <UiButton 
-          v-if="!authStore?.user"
+          v-if="!user"
           to="/auth/register" 
           variant="primary"
           size="xl"
@@ -222,9 +222,8 @@
 </template>
 
 <script setup lang="ts">
-const authStore = useAuthStore()
+const user = useSupabaseUser()
 
-// Set page meta
 useHead({
   title: 'English Learning Platform - Master English with Interactive Lessons',
   meta: [

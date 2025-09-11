@@ -1,34 +1,5 @@
 <template>
-  <!-- Authentication Guard -->
-  <div v-if="!authStore.user" class="min-h-screen flex items-center justify-center bg-gray-50">
-    <div class="max-w-md w-full space-y-8 text-center">
-      <div>
-        <div class="mx-auto h-12 w-12 bg-green-100 rounded-full flex items-center justify-center">
-          <svg class="h-6 w-6 text-green-600" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-            <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M7 21h10a2 2 0 002-2V9.414a1 1 0 00-.293-.707l-5.414-5.414A1 1 0 0012.586 3H7a2 2 0 00-2 2v14a2 2 0 002 2z"></path>
-          </svg>
-        </div>
-        <h2 class="mt-6 text-3xl font-bold text-gray-900">Dictionary Access Required</h2>
-        <p class="mt-2 text-sm text-gray-600">
-          Please sign in to access our vocabulary dictionary and track your learning progress.
-        </p>
-      </div>
-      <div class="space-y-4">
-        <UiButton to="/auth/login" variant="primary" size="lg" class="w-full">
-          Sign In
-        </UiButton>
-        <UiButton to="/auth/register" variant="secondary" size="lg" class="w-full">
-          Create Account
-        </UiButton>
-        <UiButton to="/" variant="ghost" size="lg" class="w-full">
-          ← Back to Home
-        </UiButton>
-      </div>
-    </div>
-  </div>
-
-  <!-- Main Content (only for authenticated users) -->
-  <div v-else class="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-8">
+  <div class="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-8">
     <!-- Header -->
     <div class="mb-8">
       <div class="flex items-center justify-between">
@@ -39,15 +10,7 @@
           </p>
         </div>
         <div class="flex space-x-3">
-          <UiButton to="/vocabulary/review" variant="primary" v-if="authStore.user">
-            <template #icon-left>
-              <svg class="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 6v6m0 0v6m0-6h6m-6 0H6"></path>
-              </svg>
-            </template>
-            Review Words ({{ vocabularyStats.dueForReview }})
-          </UiButton>
-          <UiButton to="/vocabulary/flashcards" variant="secondary" v-if="authStore.user">
+          <UiButton to="/vocabulary/flashcards" variant="secondary" v-if="user">
             Flashcards
           </UiButton>
         </div>
@@ -55,7 +18,7 @@
     </div>
 
     <!-- User Stats (if logged in) -->
-    <div v-if="authStore.user" class="mb-8">
+    <div v-if="user" class="mb-8">
       <div class="grid grid-cols-2 md:grid-cols-5 gap-4">
         <div class="bg-blue-50 rounded-lg p-4 text-center">
           <div class="text-2xl font-bold text-blue-600">{{ vocabularyStats.total }}</div>
@@ -118,7 +81,7 @@
           <UiButton @click="clearFilters" variant="secondary" size="sm" class="flex-1">
             Clear Filters
           </UiButton>
-          <UiButton v-if="authStore.user" @click="showMyWordsOnly = !showMyWordsOnly" 
+          <UiButton v-if="user" @click="showMyWordsOnly = !showMyWordsOnly" 
                    :variant="showMyWordsOnly ? 'primary' : 'secondary'" 
                    size="sm" class="flex-1">
             {{ showMyWordsOnly ? 'All Words' : 'My Words' }}
@@ -163,9 +126,11 @@
 </template>
 
 <script setup lang="ts">
-import type { VocabularyWord } from '@/types'
+definePageMeta({
+  middleware: 'auth'
+})
 
-const authStore = useAuthStore()
+const user = useSupabaseUser()
 const vocabularyStore = useVocabularyStore()
 const toast = useToast()
 
@@ -174,7 +139,7 @@ const searchQuery = ref('')
 const selectedLevel = ref('')
 const selectedCategory = ref('')
 const showMyWordsOnly = ref(false)
-const wordsPerPage = ref(12)
+const wordsPerPage = 12
 const currentPage = ref(1)
 
 // Computed properties
@@ -183,8 +148,8 @@ const words = computed(() => vocabularyStore.words)
 const userVocabulary = computed(() => vocabularyStore.userVocabulary)
 
 const vocabularyStats = computed(() => {
-  if (!authStore.user) return { total: 0, mastered: 0, learning: 0, new: 0, favorites: 0, dueForReview: 0 }
-  return vocabularyStore.getVocabularyStats(authStore.user.id)
+  if (!user.value) return { total: 0, mastered: 0, learning: 0, new: 0, favorites: 0, dueForReview: 0 }
+  return vocabularyStore.getVocabularyStats(user.value?.id)
 })
 
 const categoryOptions = computed(() => {
@@ -201,7 +166,7 @@ const categoryOptions = computed(() => {
 const filteredWords = computed(() => {
   let filtered = words.value
 
-  if (showMyWordsOnly.value && authStore.user) {
+  if (showMyWordsOnly.value && user.value) {
     const myWordIds = userVocabulary.value.map(uv => uv.word_id)
     filtered = filtered.filter(word => myWordIds.includes(word.id))
   }
@@ -218,7 +183,7 @@ const filteredWords = computed(() => {
 })
 
 const displayedWords = computed(() => {
-  const endIndex = currentPage.value * wordsPerPage.value
+  const endIndex = currentPage.value * wordsPerPage
   return filteredWords.value.slice(0, endIndex)
 })
 
@@ -232,8 +197,8 @@ const fetchWords = async () => {
 }
 
 const fetchUserVocabulary = async () => {
-  if (authStore.user) {
-    await vocabularyStore.fetchUserVocabulary(authStore.user.id)
+  if (user.value) {
+    await vocabularyStore.fetchUserVocabulary(user.value?.id)
   }
 }
 
@@ -242,12 +207,12 @@ const getUserWordData = (wordId: string) => {
 }
 
 const handleAddWord = async (wordId: string) => {
-  if (!authStore.user) {
+  if (!user.value) {
     toast.warning('Login Required', 'Please log in to add words to your vocabulary')
     return
   }
 
-  const result = await vocabularyStore.addWordToUserVocabulary(authStore.user.id, wordId)
+  const result = await vocabularyStore.addWordToUserVocabulary(user.value?.id, wordId)
   if (result.error) {
     toast.error('Error', 'Failed to add word to your vocabulary')
   } else {
@@ -291,7 +256,7 @@ onMounted(async () => {
 })
 
 // Watch for auth changes
-watch(() => authStore.user, async (newUser) => {
+watch(() => user.value, async (newUser) => {
   if (newUser) {
     await fetchUserVocabulary()
   }

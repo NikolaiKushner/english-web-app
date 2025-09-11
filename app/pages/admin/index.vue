@@ -9,7 +9,7 @@
             <UiBadge variant="primary" size="sm">Administrator</UiBadge>
           </div>
           <div class="flex items-center space-x-4">
-            <span class="text-sm text-gray-600">{{ authStore.user?.email }}</span>
+            <span class="text-sm text-gray-600">{{ user?.email }}</span>
             <UiButton to="/" variant="secondary" size="sm">
               ← Back to Site
             </UiButton>
@@ -249,22 +249,14 @@
 </template>
 
 <script setup lang="ts">
-const authStore = useAuthStore()
+const user = useSupabaseUser()
 const { supabase } = useSupabase()
-
-// Redirect if not admin
-if (!authStore.user) {
-  throw createError({
-    statusCode: 401,
-    statusMessage: 'Authentication required'
-  })
-}
 
 // Mock admin check - in a real app, you'd have proper role management
 const isAdmin = computed(() => {
   // For demo purposes, any logged-in user can access admin
   // In production, you'd check user roles/permissions
-  return !!authStore.user
+  return !!user.value
 })
 
 if (!isAdmin.value) {

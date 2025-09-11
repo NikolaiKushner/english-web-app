@@ -1,34 +1,5 @@
 <template>
-  <!-- Authentication Guard -->
-  <div v-if="!authStore.user" class="min-h-screen flex items-center justify-center bg-gray-50">
-    <div class="max-w-md w-full space-y-8 text-center">
-      <div>
-        <div class="mx-auto h-12 w-12 bg-yellow-100 rounded-full flex items-center justify-center">
-          <svg class="h-6 w-6 text-yellow-600" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-            <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M19 11H5m14 0a2 2 0 012 2v6a2 2 0 01-2 2H5a2 2 0 01-2-2v-6a2 2 0 012-2m14 0V9a2 2 0 00-2-2M5 11V9a2 2 0 012-2m0 0V5a2 2 0 012-2h6a2 2 0 012 2v2M7 7h10"></path>
-          </svg>
-        </div>
-        <h2 class="mt-6 text-3xl font-bold text-gray-900">Flashcards Access Required</h2>
-        <p class="mt-2 text-sm text-gray-600">
-          Please sign in to access our flashcard system and practice with spaced repetition.
-        </p>
-      </div>
-      <div class="space-y-4">
-        <UiButton to="/auth/login" variant="primary" size="lg" class="w-full">
-          Sign In
-        </UiButton>
-        <UiButton to="/auth/register" variant="secondary" size="lg" class="w-full">
-          Create Account
-        </UiButton>
-        <UiButton to="/vocabulary" variant="ghost" size="lg" class="w-full">
-          ← Back to Dictionary
-        </UiButton>
-      </div>
-    </div>
-  </div>
-
-  <!-- Main Content (only for authenticated users) -->
-  <div v-else class="max-w-4xl mx-auto px-4 sm:px-6 lg:px-8 py-8">
+  <div class="max-w-4xl mx-auto px-4 sm:px-6 lg:px-8 py-8">
     <!-- Header -->
     <div class="mb-8">
       <div class="flex items-center justify-between">
@@ -292,8 +263,8 @@
 <script setup lang="ts">
 import type { UserVocabulary } from '@/types'
 
-const authStore = useAuthStore()
 const vocabularyStore = useVocabularyStore()
+const user = useSupabaseUser()
 const toast = useToast()
 const router = useRouter()
 
@@ -316,8 +287,8 @@ const sessionStats = ref({
 const userVocabulary = computed(() => vocabularyStore.userVocabulary)
 
 const reviewStats = computed(() => {
-  if (!authStore.user) return { dueForReview: 0, learning: 0, mastered: 0, favorites: 0 }
-  return vocabularyStore.getVocabularyStats(authStore.user.id)
+  if (!user.value) return { dueForReview: 0, learning: 0, mastered: 0, favorites: 0 }
+  return vocabularyStore.getVocabularyStats(user.value?.id)
 })
 
 const currentCard = computed(() => {
@@ -352,9 +323,9 @@ const getSessionDescription = () => {
 }
 
 const getAvailableCards = () => {
-  if (!authStore.user) return []
+  if (!user.value) return []
   
-  const userId = authStore.user.id
+  const userId = user.value?.id
   
   switch (sessionType.value) {
     case 'due':
@@ -457,13 +428,13 @@ const playAudio = () => {
 
 // Initialize
 onMounted(async () => {
-  if (!authStore.user) {
+  if (!user.value) {
     toast.warning('Login Required', 'Please log in to use flashcards')
     router.push('/auth/login')
     return
   }
 
-  await vocabularyStore.fetchUserVocabulary(authStore.user.id)
+  await vocabularyStore.fetchUserVocabulary(user.value?.id)
 })
 
 // Set page meta

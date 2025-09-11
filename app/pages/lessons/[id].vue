@@ -1,6 +1,6 @@
 <template>
   <!-- Authentication Guard -->
-  <div v-if="!authStore.user" class="min-h-screen flex items-center justify-center bg-gray-50">
+  <div v-if="!user" class="min-h-screen flex items-center justify-center bg-gray-50">
     <div class="max-w-md w-full space-y-8 text-center">
       <div>
         <div class="mx-auto h-12 w-12 bg-blue-100 rounded-full flex items-center justify-center">
@@ -206,7 +206,7 @@
 <script setup lang="ts">
 const route = useRoute()
 const learningStore = useLearningStore()
-const authStore = useAuthStore()
+const user = useSupabaseUser()
 
 const lessonId = route.params.id as string
 const lesson = ref(null)
@@ -263,10 +263,10 @@ const formatMarkdown = (content: string) => {
 }
 
 const completeLesson = async (score?: number) => {
-  if (!authStore.user || !lesson.value) return
+  if (!user.value || !lesson.value) return
 
   const progressData = {
-    user_id: authStore.user.id,
+    user_id: user.value?.id,
     lesson_id: lesson.value.id,
     completed: true,
     score: score || 100,
@@ -295,7 +295,7 @@ const handleExerciseComplete = async (score: number) => {
 }
 
 const generateAIFeedback = async (score: number) => {
-  if (!authStore.user || !lesson.value) return
+  if (!user.value || !lesson.value) return
   
   try {
     const aiService = useAI()
@@ -360,8 +360,8 @@ onMounted(async () => {
     exercises.value = exercisesData || []
 
     // If user is logged in, fetch their progress
-    if (authStore.user) {
-      await learningStore.fetchUserProgress(authStore.user.id)
+    if (user.value) {
+      await learningStore.fetchUserProgress(user.value?.id)
     }
   }
 })

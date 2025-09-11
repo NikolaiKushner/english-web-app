@@ -1,34 +1,5 @@
 <template>
-  <!-- Authentication Guard -->
-  <div v-if="!authStore.user" class="min-h-screen flex items-center justify-center bg-gray-50">
-    <div class="max-w-md w-full space-y-8 text-center">
-      <div>
-        <div class="mx-auto h-12 w-12 bg-purple-100 rounded-full flex items-center justify-center">
-          <svg class="h-6 w-6 text-purple-600" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-            <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M13 10V3L4 14h7v7l9-11h-7z"></path>
-          </svg>
-        </div>
-        <h2 class="mt-6 text-3xl font-bold text-gray-900">AI Creator Access Required</h2>
-        <p class="mt-2 text-sm text-gray-600">
-          Please sign in to access our AI-powered lesson creator and generate personalized exercises.
-        </p>
-      </div>
-      <div class="space-y-4">
-        <UiButton to="/auth/login" variant="primary" size="lg" class="w-full">
-          Sign In
-        </UiButton>
-        <UiButton to="/auth/register" variant="secondary" size="lg" class="w-full">
-          Create Account
-        </UiButton>
-        <UiButton to="/" variant="ghost" size="lg" class="w-full">
-          ← Back to Home
-        </UiButton>
-      </div>
-    </div>
-  </div>
-
-  <!-- Main Content (only for authenticated users) -->
-  <div v-else class="max-w-6xl mx-auto px-4 sm:px-6 lg:px-8 py-8">
+  <div class="max-w-6xl mx-auto px-4 sm:px-6 lg:px-8 py-8">
     <div class="mb-8">
       <div class="flex items-center justify-between">
         <div>
@@ -216,7 +187,10 @@
 
 <script setup lang="ts">
 const toast = useToast()
-const authStore = useAuthStore()
+
+definePageMeta({
+  middleware: 'auth'
+})
 
 // Session state
 const sessionExercises = ref<any[]>([])

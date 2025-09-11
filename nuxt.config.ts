@@ -5,8 +5,25 @@ export default defineNuxtConfig({
   modules: [
     '@nuxtjs/tailwindcss',
     '@pinia/nuxt',
-    '@vueuse/nuxt'
+    '@vueuse/nuxt',
+    '@nuxtjs/supabase',
   ],
+  supabase: {
+    redirectOptions: {
+      login: '/auth/login',
+      callback: '/auth/confirm',
+      include: undefined,
+      exclude: [
+        '/',
+        '/auth/register',
+        '/about',
+        '/contact',
+        '/help',
+        '/privacy',
+      ],
+      saveRedirectToCookie: false,
+    }
+  },
   components: [
     {
       path: '~/components',

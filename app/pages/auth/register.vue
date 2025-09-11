@@ -76,7 +76,7 @@
 
         <UiButton
           type="submit"
-          :loading="authStore.loading"
+          :loading="loading"
           loading-text="Creating account..."
           block
           size="lg"
@@ -89,8 +89,8 @@
 </template>
 
 <script setup lang="ts">
-const authStore = useAuthStore()
-const router = useRouter()
+const supabase = useSupabaseClient()
+const user = useSupabaseUser()
 
 const form = reactive({
   name: '',
@@ -101,6 +101,7 @@ const form = reactive({
 
 const error = ref('')
 const success = ref('')
+const loading = ref(false)
 
 const handleRegister = async () => {
   error.value = ''
@@ -121,7 +122,19 @@ const handleRegister = async () => {
     return
   }
 
-  const { data, error: registerError } = await authStore.signUp(form.email, form.password, form.name)
+  loading.value = true
+
+  const { data, error: registerError } = await supabase.auth.signUp({
+    email: form.email,
+    password: form.password,
+    options: {
+      data: {
+        name: form.name
+      }
+    }
+  });
+  
+  loading.value = false
   
   if (registerError) {
     error.value = registerError.message || 'An error occurred during registration'
@@ -137,12 +150,11 @@ const handleRegister = async () => {
   }
 }
 
-// Redirect if already logged in
-watch(() => authStore.user, (user) => {
-  if (user) {
-    router.push('/')
+watchEffect(() => {
+  if (user.value) {
+    return navigateTo('/')
   }
-}, { immediate: true })
+})
 
 // Set page meta
 useHead({
